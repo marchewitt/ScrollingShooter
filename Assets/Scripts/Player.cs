@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+
 public class Player : MonoBehaviour
 {
     [Tooltip("Players movement speed")]
-    [SerializeField] float speed = 3.5f;
-   
+    [SerializeField] private float speed = 3.5f;
+
+    [Header("Laser Settings")]
+    [SerializeField] private Transform laserSpawnPosition;
+    [SerializeField] private GameObject laserPrefab;
     
     //Screen Bounds
-    private readonly float _screenRight = 8.5f;
-    private readonly float _screenLeft = -8.5f;
-    private readonly float _screenTop = 5.8f;
-    private readonly float _screenBottom = -3.8f;
+    private const float ScreenRight = 8.5f;
+    private const float ScreenLeft = -8.5f;
+    private const float ScreenTop = 5.8f;
+    private const float ScreenBottom = -3.8f;
 
     public void Start()
     {
@@ -36,22 +40,31 @@ public class Player : MonoBehaviour
         #region Wrap And Clamp Screen Bounds
 
         var position = transform.position;
-        if (position.x > _screenRight)
+        if (position.x > ScreenRight)
         {
-            position = new Vector3(_screenLeft, position.y, 0);
+            position = new Vector3(ScreenLeft, position.y, 0);
         } 
-        else if (transform.position.x < _screenLeft)
+        else if (transform.position.x < ScreenLeft)
         {
-            position = new Vector3(_screenRight, position.y, 0);
+            position = new Vector3(ScreenRight, position.y, 0);
         }
 
         transform.position = new Vector3(
             position.x,
-            Mathf.Clamp(position.y, _screenBottom, _screenTop),
+            Mathf.Clamp(position.y, ScreenBottom, ScreenTop),
             0);
         
         #endregion
 
         #endregion
+        
+        #region Shoot Input
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
+        }
+        #endregion
+        
     }
 }
