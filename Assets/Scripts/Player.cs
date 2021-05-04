@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     [Header("Laser Settings")]
     [SerializeField] private Transform laserSpawnPosition;
     [SerializeField] private GameObject laserPrefab;
+    [SerializeField] private float fireRate = 0.15f;
+    private float _canFireTimer = 0;
     
     //Screen Bounds
     private const float ScreenRight = 8.5f;
@@ -27,14 +29,21 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        
-        #region Calculate Movement Off Input
+        CalculateMovement();
 
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFireTimer)
+        {
+            FireLaser();
+        }
+    }
+
+    private void CalculateMovement()
+    {
         float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput  = Input.GetAxis("Vertical");
-        
+        float verticalInput = Input.GetAxis("Vertical");
+
         var moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
-        
+
         transform.Translate((moveDirection * (speed * Time.deltaTime)));
 
         #region Wrap And Clamp Screen Bounds
@@ -43,7 +52,7 @@ public class Player : MonoBehaviour
         if (position.x > ScreenRight)
         {
             position = new Vector3(ScreenLeft, position.y, 0);
-        } 
+        }
         else if (transform.position.x < ScreenLeft)
         {
             position = new Vector3(ScreenRight, position.y, 0);
@@ -53,18 +62,13 @@ public class Player : MonoBehaviour
             position.x,
             Mathf.Clamp(position.y, ScreenBottom, ScreenTop),
             0);
-        
-        #endregion
 
         #endregion
-        
-        #region Shoot Input
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
-        }
-        #endregion
-        
+    private void FireLaser()
+    {
+        _canFireTimer = Time.time + fireRate;
+        Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
     }
 }
