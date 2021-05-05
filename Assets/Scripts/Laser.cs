@@ -21,10 +21,17 @@ public class Laser : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
-    // private void OnCollisionEnter()
+
+    public void DestoryUs()
+    {
+        //Instantiate(collisionPrefab, transform.position, transform.rotation);
+        Destroy(gameObject);
+    }
+    // private void OnTriggerEnter(Collider other)
     // {
-    //     Instantiate(collisionPrefab, transform.position, transform.rotation);
+    //     if (!other.CompareTag("Enemy")) return;
+    //     
+    //     
     //     Destroy(gameObject);
     // }
 }
