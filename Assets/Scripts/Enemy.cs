@@ -7,8 +7,7 @@ public class Enemy : MonoBehaviour
     [Tooltip("Enemy's movement speed")]
     [SerializeField] private float speed = 4.0f;
     
-    private Vector3 _direction = Vector3.down; 
-    
+    private Vector3 _direction = Vector3.down;
 
     private void Update()
     {
@@ -43,7 +42,7 @@ public class Enemy : MonoBehaviour
         }
         else if (other.CompareTag("Player"))
         {
-            Player player = other.gameObject.GetComponent<Player>();
+            var player = other.gameObject.GetComponent<Player>();
             if (player)
             {
                 player.TakeDamage(1);

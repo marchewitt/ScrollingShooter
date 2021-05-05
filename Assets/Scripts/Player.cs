@@ -13,15 +13,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireTimer = 0;
     
-    //Screen Bounds
-    // private const float ScreenRight = 8.5f;
-    // private const float ScreenLeft = -8.5f;
-    // private const float ScreenTop = 5.8f;
-    // private const float ScreenBottom = -3.8f;
 
     public void Start()
     {
-        transform.position = Vector3.zero;
     }
 
 
