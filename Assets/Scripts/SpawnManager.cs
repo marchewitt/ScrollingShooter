@@ -8,7 +8,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private Enemy enemyPrefab;
     [SerializeField] private GameObject enemeyContainer;
     [SerializeField] private float spawnRate = 3f;
-    
+
+    private bool _spawnEnemies = true;
     
     void Start()
     {
@@ -17,7 +18,7 @@ public class SpawnManager : MonoBehaviour
 
     private IEnumerator SpawnEnemy()
     {
-        while (true)
+        while (_spawnEnemies)
         {
             var spawnPos = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight),
                   ScreenBounds.ScreenTop + 2f, 0);
@@ -27,5 +28,10 @@ public class SpawnManager : MonoBehaviour
             
             yield return new WaitForSeconds(spawnRate);
         }
+    }
+
+    public void OnPlayerDeath()
+    {
+        _spawnEnemies = false;
     }
 }

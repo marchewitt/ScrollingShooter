@@ -12,10 +12,13 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject laserPrefab;
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireTimer = 0;
-    
 
+
+    private SpawnManager _spawnManager;
     public void Start()
     {
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        if(_spawnManager == null){Debug.LogError("Spawn_Manager was null");}
     }
 
 
@@ -73,6 +76,7 @@ public class Player : MonoBehaviour
     private void DestroyUs()
     {
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
+        _spawnManager.OnPlayerDeath();
         Destroy(gameObject);
     }
 }
