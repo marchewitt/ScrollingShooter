@@ -71,7 +71,9 @@ public class Player : MonoBehaviour
     {
         health -= value;
         Debug.Log($"Player Remaining Health {health}");
-        DestroyUs();
+        if(health <= 0){
+            DestroyUs();
+        }
     }
 
     private void DestroyUs()
