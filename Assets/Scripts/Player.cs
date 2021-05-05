@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-
+using Config;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private int health = 3;
     [Tooltip("Players movement speed")]
     [SerializeField] private float speed = 3.5f;
 
@@ -14,16 +12,13 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject laserPrefab;
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireTimer = 0;
-    
-    //Screen Bounds
-    private const float ScreenRight = 8.5f;
-    private const float ScreenLeft = -8.5f;
-    private const float ScreenTop = 5.8f;
-    private const float ScreenBottom = -3.8f;
 
+
+    private SpawnManager _spawnManager;
     public void Start()
     {
-        transform.position = Vector3.zero;
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        if(_spawnManager == null){Debug.LogError("Spawn_Manager was null");}
     }
 
 
@@ -49,19 +44,16 @@ public class Player : MonoBehaviour
         #region Wrap And Clamp Screen Bounds
 
         var position = transform.position;
-        if (position.x > ScreenRight)
+        if (position.x > ScreenBounds.ScreenRight)
         {
-            position = new Vector3(ScreenLeft, position.y, 0);
+            position = new Vector3(ScreenBounds.ScreenLeft, position.y, 0);
         }
-        else if (transform.position.x < ScreenLeft)
+        else if (transform.position.x < ScreenBounds.ScreenLeft)
         {
-            position = new Vector3(ScreenRight, position.y, 0);
+            position = new Vector3(ScreenBounds.ScreenRight, position.y, 0);
         }
 
-        transform.position = new Vector3(
-            position.x,
-            Mathf.Clamp(position.y, ScreenBottom, ScreenTop),
-            0);
+        transform.position = new Vector3(position.x, Mathf.Clamp(position.y, ScreenBounds.ScreenBottom, ScreenBounds.ScreenTop), 0);
 
         #endregion
     }
@@ -70,5 +62,21 @@ public class Player : MonoBehaviour
     {
         _canFireTimer = Time.time + fireRate;
         Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
+    }
+
+    public void TakeDamage(int value)
+    {
+        health -= value;
+        Debug.Log($"Player Remaining Health {health}");
+        if(health <= 0){
+            DestroyUs();
+        }
+    }
+
+    private void DestroyUs()
+    {
+        //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
+        _spawnManager.OnPlayerDeath();
+        Destroy(gameObject);
     }
 }
