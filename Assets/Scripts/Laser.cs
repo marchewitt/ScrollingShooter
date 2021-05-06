@@ -6,7 +6,9 @@ public class Laser : MonoBehaviour
     [SerializeField] private float speed = 8f;
     
     [Header("Prefabs Needed")]
-    [SerializeField] private GameObject collisionPrefab;
+    [SerializeField] private GameObject explosionVFX_Prefab;
+
+    
 
     // Update is called once per frame
     private void Update()
