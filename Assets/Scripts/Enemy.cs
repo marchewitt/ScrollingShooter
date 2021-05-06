@@ -1,3 +1,4 @@
+using System;
 using Config;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -32,8 +33,11 @@ public class Enemy : MonoBehaviour
         transform.position = new Vector3(randomX, ScreenBounds.ScreenTop + 2f, 0);
     }
 
-    private void OnTriggerEnter(Collider other)
+
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("hit");
         if (other.CompareTag("Player_Attack"))
         {
             other.GetComponent<Laser>().DestoryUs();
