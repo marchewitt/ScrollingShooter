@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 7581145933420388881}
   - component: {fileID: 5501807560146659420}
   - component: {fileID: 2181630196049530992}
+  - component: {fileID: 1457223910}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -77,10 +78,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  speed: 3.5
+  baseSpeed: 3.5
   laserSpawnPosition: {fileID: 7549750829881192046}
   laserPrefab: {fileID: 601476321009827572, guid: b468767f04b48f748a9792e2eb931dc8, type: 3}
+  tripleShotPrefab: {fileID: 990644612083187565, guid: 2484f7187977a0749b43d4852c6e8fb4, type: 3}
   fireRate: 0.15
+  speedPowerUpMultiplier: 2
 --- !u!212 &5501807560146659420
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -142,7 +145,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0.038095593, y: -0.021360874}
@@ -158,3 +161,24 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.287194, y: 4.1498976}
   m_EdgeRadius: 0
+--- !u!50 &1457223910
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7581145933420388884}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

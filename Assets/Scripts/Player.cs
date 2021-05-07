@@ -7,7 +7,8 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private int health = 3;
     [Tooltip("Players movement speed")]
-    [SerializeField] private float speed = 3.5f;
+    [SerializeField] private float baseSpeed = 3.5f;
+    private float _speed = 0;
 
     [Header("Laser Settings")]
     [SerializeField] private Transform laserSpawnPosition;
@@ -17,13 +18,28 @@ public class Player : MonoBehaviour
     private float _canFireTimer = 0;
 
     [Header("TripleShot PowerUp")]
-    public bool _isTripleShotEnabled = false; //Todo: Currently testing, eventually make this private
+    private bool _isTripleShotEnabled = false;
+    private IEnumerator _tripleShotTimerRef;
+
+    [Header("Speed PowerUp")]
+    [Tooltip("1.3f would be 30% faster")]
+    [SerializeField] private float speedPowerUpMultiplier = 1.3f;
+    private bool _isSpeedUpEnabled = false;
+    private IEnumerator _speedTimerRef;
 
     private SpawnManager _spawnManager;
+
+    public void Awake()
+    {
+        _speed = baseSpeed;
+    }
+
     public void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         if(_spawnManager == null){Debug.LogError("Spawn_Manager was null");}
+
+        
     }
 
     private void Update()
@@ -43,7 +59,8 @@ public class Player : MonoBehaviour
 
         var moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
 
-        transform.Translate((moveDirection * (speed * Time.deltaTime)));
+        transform.Translate((moveDirection * (_speed * Time.deltaTime)));    
+        
 
         #region Wrap And Clamp Screen Bounds
 
@@ -87,22 +104,62 @@ public class Player : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private IEnumerator _powerUpTimerRef;
-    public void CollectPowerUp(PowerUp powerUp)
+    // private IEnumerator _powerUpTimerRef;
+    // public void CollectPowerUp(PowerUp powerUp)
+    // {
+    //     if (_powerUpTimerRef != null)
+    //     {
+    //         StopCoroutine(_powerUpTimerRef);
+    //     }
+    //     _isTripleShotEnabled = true; //TODO: unique PowerUp
+    //     _powerUpTimerRef = PowerUpTimer(powerUp.Duration);
+    //     StartCoroutine(_powerUpTimerRef);
+    // }
+    //
+    // private IEnumerator PowerUpTimer(float timer)
+    // {
+    //     Debug.Log("Timer");
+    //     yield return new WaitForSeconds(timer);
+    //     _isTripleShotEnabled = false;
+    // }
+    
+
+    public void CollectPowerUp_TripleShot(PowerUp powerUp)
     {
-        if (_powerUpTimerRef != null)
+        if (_tripleShotTimerRef != null)
         {
-            StopCoroutine(_powerUpTimerRef);
+            StopCoroutine(_tripleShotTimerRef);
         }
-        _isTripleShotEnabled = true; //TODO: unique PowerUp
-        _powerUpTimerRef = PowerUpTimer(powerUp.Duration);
-        StartCoroutine(_powerUpTimerRef);
+        _isTripleShotEnabled = true;
+        _tripleShotTimerRef = PowerUpTimer_TripleShot(powerUp.Duration);
+        StartCoroutine(_tripleShotTimerRef);
     }
 
-    private IEnumerator PowerUpTimer(float timer)
+    private IEnumerator PowerUpTimer_TripleShot(float timer)
     {
         Debug.Log("Timer");
         yield return new WaitForSeconds(timer);
         _isTripleShotEnabled = false;
+    }
+
+
+    public void CollectPowerUp_SpeedUp(PowerUp powerUp)
+    {
+        if (_speedTimerRef != null)
+        {
+            StopCoroutine(_speedTimerRef);
+        }
+        _isSpeedUpEnabled = true; 
+        _speed = baseSpeed * speedPowerUpMultiplier;
+        
+        _speedTimerRef = PowerUpTimer_SpeedUp(powerUp.Duration);
+        StartCoroutine(_speedTimerRef);
+    }
+
+    private IEnumerator PowerUpTimer_SpeedUp(float timer)
+    {
+        Debug.Log("Timer");
+        yield return new WaitForSeconds(timer);
+        _speed = baseSpeed;
     }
 }
