@@ -457,7 +457,9 @@ MonoBehaviour:
   enemyPrefab: {fileID: 6961020380445796214, guid: d0ce5d203c0b1964ba05977f2eea6b88, type: 3}
   enemyContainer: {fileID: 2070711420}
   enemySpawnRate: 3
-  powerUpPrefab: {fileID: 7277013844022480300, guid: e84f836ee27c7fa4888674d34efd0f88, type: 3}
+  powerUpPrefabs:
+  - {fileID: 7277013844022480300, guid: e84f836ee27c7fa4888674d34efd0f88, type: 3}
+  - {fileID: 4712528788082069719, guid: b50a5b0a9c279514bac665de7408800f, type: 3}
   powerUpSpawnRateRange: {x: 3, y: 7}
   powerUpContainer: {fileID: 604592229}
 --- !u!1 &1553975135
