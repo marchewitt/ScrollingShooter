@@ -7,12 +7,10 @@ public class Enemy : MonoBehaviour
 {
     [Tooltip("Enemy's movement speed")]
     [SerializeField] private float speed = 4.0f;
-    
-    private Vector3 _direction = Vector3.down;
 
     private void Update()
     {
-        transform.Translate(_direction * (speed * Time.deltaTime));
+        transform.Translate(Vector3.down * (speed * Time.deltaTime));
 
         if (transform.position.y < ScreenBounds.ScreenBottom)
         {

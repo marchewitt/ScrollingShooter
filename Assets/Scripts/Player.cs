@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     private float _canFireTimer = 0;
 
     [Header("TripleShot PowerUp")]
-    public bool _isTripleShotEnabled = false;
+    public bool _isTripleShotEnabled = false; //Todo: Currently testing, eventually make this private
 
     private SpawnManager _spawnManager;
     public void Start()
@@ -95,7 +95,7 @@ public class Player : MonoBehaviour
             StopCoroutine(_powerUpTimerRef);
         }
         _isTripleShotEnabled = true; //TODO: unique PowerUp
-        _powerUpTimerRef = PowerUpTimer(powerUp.powerUpLength);
+        _powerUpTimerRef = PowerUpTimer(powerUp.Duration);
         StartCoroutine(_powerUpTimerRef);
     }
 

@@ -455,11 +455,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 6961020380445796214, guid: d0ce5d203c0b1964ba05977f2eea6b88, type: 3}
-  enemeyContainer: {fileID: 2070711420}
+  enemyContainer: {fileID: 2070711420}
   enemySpawnRate: 3
   powerUpPrefab: {fileID: 7277013844022480300, guid: e84f836ee27c7fa4888674d34efd0f88, type: 3}
   powerUpSpawnRateRange: {x: 3, y: 7}
-  powerupContainer: {fileID: 604592229}
+  powerUpContainer: {fileID: 604592229}
 --- !u!1 &1457223909 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7581145933420388884, guid: af635ec291a21cc41b61bea134fec22a, type: 3}

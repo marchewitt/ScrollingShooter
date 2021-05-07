@@ -3,20 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using Config;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PowerUp : MonoBehaviour
 {
     [SerializeField] private float speed = 3.0f;
-    public float powerUpLength = 3.0f;
-    
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private float duration = 3.0f;
+
+    public float Duration
     {
-        
+        get => duration;
+        private set => duration = value;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         transform.Translate(Vector3.down * (speed * Time.deltaTime));
 
