@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using Config;
 
@@ -10,9 +12,12 @@ public class Player : MonoBehaviour
     [Header("Laser Settings")]
     [SerializeField] private Transform laserSpawnPosition;
     [SerializeField] private GameObject laserPrefab;
+    [SerializeField] private GameObject tripleShotPrefab;
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireTimer = 0;
 
+    [Header("TripleShot PowerUp")]
+    public bool _isTripleShotEnabled = false; //Todo: Currently testing, eventually make this private
 
     private SpawnManager _spawnManager;
     public void Start()
@@ -20,7 +25,6 @@ public class Player : MonoBehaviour
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         if(_spawnManager == null){Debug.LogError("Spawn_Manager was null");}
     }
-
 
     private void Update()
     {
@@ -61,7 +65,10 @@ public class Player : MonoBehaviour
     private void FireLaser()
     {
         _canFireTimer = Time.time + fireRate;
-        Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
+        
+        //Is Power-up active?
+        var prefabToUse = _isTripleShotEnabled ? tripleShotPrefab : laserPrefab;
+        Instantiate(prefabToUse, laserSpawnPosition.position, Quaternion.identity);
     }
 
     public void TakeDamage(int value)
@@ -78,5 +85,24 @@ public class Player : MonoBehaviour
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
         _spawnManager.OnPlayerDeath();
         Destroy(gameObject);
+    }
+
+    private IEnumerator _powerUpTimerRef;
+    public void CollectPowerUp(PowerUp powerUp)
+    {
+        if (_powerUpTimerRef != null)
+        {
+            StopCoroutine(_powerUpTimerRef);
+        }
+        _isTripleShotEnabled = true; //TODO: unique PowerUp
+        _powerUpTimerRef = PowerUpTimer(powerUp.Duration);
+        StartCoroutine(_powerUpTimerRef);
+    }
+
+    private IEnumerator PowerUpTimer(float timer)
+    {
+        Debug.Log("Timer");
+        yield return new WaitForSeconds(timer);
+        _isTripleShotEnabled = false;
     }
 }
