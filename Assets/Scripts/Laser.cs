@@ -5,32 +5,26 @@ public class Laser : MonoBehaviour
 {
     [SerializeField] private float speed = 8f;
     
-    [Header("Prefabs Needed")]
-    [SerializeField] private GameObject explosionVFX_Prefab;
-
     
-
-    // Update is called once per frame
     private void Update()
     {
         transform.Translate(Vector3.up * (speed * Time.deltaTime));
 
         if (transform.position.y >= 8f)
         {
-            Destroy(gameObject);
+            DestroyUs();
         }
     }
 
-    public void DestoryUs()
+    public void DestroyUs()
     {
-        //Instantiate(collisionPrefab, transform.position, transform.rotation);
-        Destroy(gameObject);
+        if (transform.parent)
+        {
+            Destroy(transform.parent.gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (!other.CompareTag("Enemy")) return;
-    //     
-    //     
-    //     Destroy(gameObject);
-    // }
 }

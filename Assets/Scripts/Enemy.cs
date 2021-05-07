@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour
         Debug.Log("hit");
         if (other.CompareTag("Player_Attack"))
         {
-            other.GetComponent<Laser>().DestoryUs();
+            other.GetComponent<Laser>().DestroyUs();
             DestroyUs();
             //TODO: RewardPoints();
         }
