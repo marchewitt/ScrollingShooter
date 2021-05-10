@@ -5,8 +5,16 @@ using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour
 {
+    private Player _playerRef;
+    [SerializeField] private int pointsWorth = 10;
     [Tooltip("Enemy's movement speed")]
     [SerializeField] private float speed = 4.0f;
+
+    private void Start()
+    {
+        _playerRef = GameObject.FindWithTag("Player").GetComponent<Player>();
+        if(_playerRef == null){Debug.LogError("_playerRef was null in " + gameObject);}
+    }
 
     private void Update()
     {
@@ -39,8 +47,8 @@ public class Enemy : MonoBehaviour
         if (other.CompareTag("Player_Attack"))
         {
             other.GetComponent<Laser>().DestroyUs();
+            if( _playerRef ) { _playerRef.AddScore(pointsWorth); }
             DestroyUs();
-            //TODO: RewardPoints();
         }
         else if (other.CompareTag("Player"))
         {
