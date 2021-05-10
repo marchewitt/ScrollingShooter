@@ -47,6 +47,7 @@ public class PowerUp : MonoBehaviour
                     break;
                 case 2:
                     Debug.Log("Shield Picked up");
+                    player.CollectPowerUp_Shield(this);
                     break;
             }
         }

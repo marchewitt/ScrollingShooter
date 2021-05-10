@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Config;
+using UnityEngineInternal;
 
 public class Player : MonoBehaviour
 {
@@ -27,10 +28,24 @@ public class Player : MonoBehaviour
     private bool _isSpeedUpEnabled = false;
     private IEnumerator _speedTimerRef;
 
+    [Header("Speed PowerUp")] 
+    [SerializeField] private GameObject shieldsVFXRef;
+
     private SpawnManager _spawnManager;
+    private bool _isShieldOn = false;
+    private bool IsShieldOn
+    {
+        get => _isShieldOn;
+        set
+        {
+            _isShieldOn = value;
+            shieldsVFXRef.SetActive(_isShieldOn);
+        }
+    }
 
     public void Awake()
     {
+        shieldsVFXRef.SetActive(false);
         _speed = baseSpeed;
     }
 
@@ -90,6 +105,11 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int value)
     {
+        if (IsShieldOn)
+        {
+            IsShieldOn = false;
+            return;
+        }
         health -= value;
         Debug.Log($"Player Remaining Health {health}");
         if(health <= 0){
@@ -162,4 +182,14 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(timer);
         _speed = baseSpeed;
     }
+    
+    public void CollectPowerUp_Shield(PowerUp powerUp)
+    {
+        if (IsShieldOn)
+        {
+            return;
+        }
+        IsShieldOn = true;
+    }
+    
 }
