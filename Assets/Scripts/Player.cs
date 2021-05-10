@@ -64,6 +64,17 @@ public class Player : MonoBehaviour
         }
     }
 
+    private int Health
+    {
+        get => health;
+        set
+        {
+            health = value;
+            if(_uiManager){ _uiManager.UpdateLives(health);}
+            if(health <= 0){ DestroyUs(); }
+        }
+    }
+
     public void Awake()
     {
         shieldsVFXRef.SetActive(false);
@@ -73,7 +84,7 @@ public class Player : MonoBehaviour
     public void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-        _uiManager = GameObject.Find("MasterCanvas").GetComponent<UIManager>();
+        _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
         if(_spawnManager == null){Debug.LogError("SpawnManager was null");}
         if(_uiManager == null){Debug.LogError("UIManager was null");}
         
@@ -132,11 +143,7 @@ public class Player : MonoBehaviour
             IsShieldOn = false;
             return;
         }
-        health -= value;
-        Debug.Log($"Player Remaining Health {health}");
-        if(health <= 0){
-            DestroyUs();
-        }
+        Health -= value;
     }
 
     private void DestroyUs()
@@ -144,6 +151,7 @@ public class Player : MonoBehaviour
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
         _spawnManager.OnPlayerDeath();
         Destroy(gameObject);
+        _uiManager.UpdateGameOver(true);
     }
 
     // private IEnumerator _powerUpTimerRef;
