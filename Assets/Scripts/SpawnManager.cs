@@ -13,7 +13,7 @@ public class SpawnManager : MonoBehaviour
     
     [Header("PowerUp Spawner")]
     [Tooltip("PowerUp SpawnRate off min - max time range in seconds")]
-    [SerializeField] private GameObject powerUpPrefab;
+    [SerializeField] private GameObject[] powerUpPrefabs;
     [SerializeField] private Vector2 powerUpSpawnRateRange = new Vector2(3f, 7f);
     [SerializeField] private GameObject powerUpContainer;
 
@@ -49,14 +49,17 @@ public class SpawnManager : MonoBehaviour
         {
             var spawnPos = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight),
                 ScreenBounds.ScreenTop + 2f, 0);
-                
-            var newPowerUp = Instantiate(powerUpPrefab, spawnPos, Quaternion.identity);
+
+            var randomPowerup = Random.Range(0, powerUpPrefabs.Length);
+            var newPowerUp = Instantiate(powerUpPrefabs[randomPowerup], spawnPos, Quaternion.identity);
             newPowerUp.transform.parent = powerUpContainer.transform;
             
             var nextSpawnTime = Random.Range(powerUpSpawnRateRange.x, powerUpSpawnRateRange.y);
             yield return new WaitForSeconds(nextSpawnTime);
         }
     }
+    
+    
 
     #endregion
 
