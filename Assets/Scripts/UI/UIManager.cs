@@ -13,14 +13,25 @@ namespace UI
         [SerializeField] private Sprite[] livesSprites;
 
         [SerializeField] private Canvas gameOverCanvas;
-        // Start is called before the first frame update
+        
         private void Start()
         {
+            if (gameOverCanvas)
+            {
+                gameOverCanvas.gameObject.SetActive(false);
+            }
+            else
+            {
+                Debug.LogError("gameOverCanvas is null");
+            }
             if (scoreTextRef == null)
             {
                 Debug.LogError("ScoreTextRef is null");
             }
-            scoreTextRef.text = $"Score: 0";
+            else
+            {
+                scoreTextRef.text = $"Score: 0";    
+            }
         }
 
 
