@@ -43,7 +43,7 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("hit");
+        //Debug.Log("hit");
         if (other.CompareTag("Player_Attack"))
         {
             other.GetComponent<Laser>().DestroyUs();

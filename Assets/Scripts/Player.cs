@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     //Manager Refs
     private SpawnManager _spawnManager;
     private UIManager _uiManager;
-    
+    private GameManager _gameManager;
     
     [Header("Player Data")]
     private int _score = 0;
@@ -41,6 +41,8 @@ public class Player : MonoBehaviour
     [Header("Speed PowerUp")] 
     private bool _isShieldOn = false;
     [SerializeField] private GameObject shieldsVFXRef;
+    
+
     private bool IsShieldOn
     {
         get => _isShieldOn;
@@ -85,6 +87,7 @@ public class Player : MonoBehaviour
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_spawnManager == null){Debug.LogError("SpawnManager was null");}
         if(_uiManager == null){Debug.LogError("UIManager was null");}
         
@@ -151,6 +154,7 @@ public class Player : MonoBehaviour
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
         _spawnManager.OnPlayerDeath();
         _uiManager.UpdateGameOver(true);
+        _gameManager.GameOver();
         Destroy(gameObject);
     }
 

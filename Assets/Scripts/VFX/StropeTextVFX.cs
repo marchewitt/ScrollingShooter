@@ -29,7 +29,7 @@ namespace VFX
             }
         }
 
-        IEnumerator Strobe()
+        private IEnumerator Strobe()
         {
             string originalText = targetTMP.text;
             bool isOn = true;
