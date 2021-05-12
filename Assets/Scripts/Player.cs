@@ -17,7 +17,8 @@ public class Player : MonoBehaviour
     [Header("Player Config")]
     [SerializeField] private int health = 3;
     [SerializeField] private float baseSpeed = 3.5f;
-    
+    [SerializeField] private GameObject rightEngineRef;
+    [SerializeField] private GameObject leftEngineRef;
 
     [Header("Laser Settings")]
     [SerializeField] private Transform laserSpawnPosition;
@@ -70,14 +71,29 @@ public class Player : MonoBehaviour
         {
             health = value;
             if(_uiManager){ _uiManager.UpdateLives(health);}
-            if(health <= 0){ OnPlayerDestroy(); }
+
+            if (health <= 0)
+            {
+                OnPlayerDestroy();
+            }
+            else
+            {
+                UpdateShipVisuals(health);
+            }
         }
     }
+
+
 
     public void Awake()
     {
         shieldsVFXRef.SetActive(false);
         _speed = baseSpeed;
+        
+        if(rightEngineRef == null){Debug.LogError("rightEngineRef was null");}
+        rightEngineRef.SetActive(false);
+        if(leftEngineRef == null){Debug.LogError("leftEngineRef was null");}
+        leftEngineRef.SetActive(false);
     }
 
     public void Start()
@@ -207,6 +223,27 @@ public class Player : MonoBehaviour
     {
         if(value > 0){
             Score += value;
+        }
+    }
+    
+    
+    private void UpdateShipVisuals(int currentHealth)
+    {
+        //Update the ship damage visuals based on currentHealth
+        switch(currentHealth)
+        {
+            case 3:
+                rightEngineRef.SetActive(false);
+                leftEngineRef.SetActive(false);
+                break;
+            case 2:
+                rightEngineRef.SetActive(true);
+                leftEngineRef.SetActive(false);
+                break;
+            case 1:
+                rightEngineRef.SetActive(true);
+                leftEngineRef.SetActive(true);
+                break;
         }
     }
 }
