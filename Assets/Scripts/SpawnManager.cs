@@ -36,9 +36,9 @@ public class SpawnManager : MonoBehaviour
     }
 
     #region Spawner Logic
-    private IEnumerator SpawnEnemy(float intialSpawnDelay)
+    private IEnumerator SpawnEnemy(float initialSpawnDelay)
     {
-        yield return new WaitForSeconds(intialSpawnDelay);
+        yield return new WaitForSeconds(initialSpawnDelay);
         while (_spawnEnemies)
         {
             var spawnPos = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight),
@@ -50,9 +50,9 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(enemySpawnRate);
         }
     }
-    private IEnumerator SpawnPowerUp(float intialSpawnDelay)
+    private IEnumerator SpawnPowerUp(float initialSpawnDelay)
     {
-        yield return new WaitForSeconds(intialSpawnDelay);
+        yield return new WaitForSeconds(initialSpawnDelay);
         
         while (_spawnPowerUp)
         {
@@ -67,9 +67,6 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(nextSpawnTime);
         }
     }
-    
-    
-
     #endregion
 
     public void OnPlayerDeath()
