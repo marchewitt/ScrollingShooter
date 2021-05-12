@@ -12,6 +12,7 @@ public class PowerUp : MonoBehaviour
     
     [Tooltip("0 is TripleShot, 1 is SpeedUp, 2 is Shield")]
     [SerializeField] private int powerUpID;
+    [SerializeField] private AudioClip powerUpAudio;
     public float Duration
     {
         get => duration;
@@ -35,6 +36,7 @@ public class PowerUp : MonoBehaviour
         var player = other.GetComponent<Player>();
         if (player)
         {
+            AudioSource.PlayClipAtPoint(powerUpAudio, transform.position);
             switch (powerUpID)
             {
                 case 0:

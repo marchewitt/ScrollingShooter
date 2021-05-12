@@ -98,7 +98,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  powerUpLength: 3
+  duration: 3
+  powerUpID: 0
+  powerUpAudio: {fileID: 8300000, guid: 69788e6f3d5744e4fa6ed37a490fecea, type: 3}
 --- !u!61 &6887944342089920562
 BoxCollider2D:
   m_ObjectHideFlags: 0

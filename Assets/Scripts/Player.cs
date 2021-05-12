@@ -1,14 +1,19 @@
 using System.Collections;
 using UnityEngine;
 using Config;
+using Managers;
 using UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class Player : MonoBehaviour
 {
     //Manager Refs
     private SpawnManager _spawnManager;
     private UIManager _uiManager;
     private GameManager _gameManager;
+    
+    //Internal Refs
+    private AudioSource _audioSource;
     
     [Header("Player Data")]
     private float _speed;
@@ -19,8 +24,12 @@ public class Player : MonoBehaviour
     [SerializeField] private float baseSpeed = 3.5f;
     [SerializeField] private GameObject rightEngineRef;
     [SerializeField] private GameObject leftEngineRef;
+    
 
-    [Header("Laser Settings")]
+    [Header("Laser Settings")] 
+    
+    [SerializeField] private AudioClip laserFireAudio;
+    
     [SerializeField] private Transform laserSpawnPosition;
     [SerializeField] private GameObject laserPrefab;
     [SerializeField] private GameObject tripleShotPrefab;
@@ -94,6 +103,12 @@ public class Player : MonoBehaviour
         rightEngineRef.SetActive(false);
         if(leftEngineRef == null){Debug.LogError("leftEngineRef was null");}
         leftEngineRef.SetActive(false);
+        _audioSource = gameObject.GetComponent<AudioSource>();
+        if(_audioSource == null){Debug.LogError("audioSource was null");}
+        
+        if(laserFireAudio == null){
+            Debug.LogError("laserFireAudio was null");
+        }
     }
 
     public void Start()
@@ -151,6 +166,7 @@ public class Player : MonoBehaviour
         //Check if Power-up is active or if default laser
         var prefabToUse = _isTripleShotEnabled ? tripleShotPrefab : laserPrefab;
         Instantiate(prefabToUse, laserSpawnPosition.position, Quaternion.identity);
+        PlayOneShot(laserFireAudio);
     }
 
     public void TakeDamage(int value)
@@ -244,6 +260,15 @@ public class Player : MonoBehaviour
                 rightEngineRef.SetActive(true);
                 leftEngineRef.SetActive(true);
                 break;
+        }
+    }
+
+
+    private void PlayOneShot(AudioClip clip)
+    {
+        if (clip)
+        {
+            _audioSource.PlayOneShot(clip);
         }
     }
 }
