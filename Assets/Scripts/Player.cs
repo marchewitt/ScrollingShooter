@@ -1,11 +1,22 @@
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Config;
+using TMPro.EditorUtilities;
+using UI;
 using UnityEngineInternal;
 
 public class Player : MonoBehaviour
 {
+    //Manager Refs
+    private SpawnManager _spawnManager;
+    private UIManager _uiManager;
+    private GameManager _gameManager;
+    
+    [Header("Player Data")]
+    private int _score = 0;
+    [Header("Player Config")]
     [SerializeField] private int health = 3;
     [Tooltip("Players movement speed")]
     [SerializeField] private float baseSpeed = 3.5f;
@@ -25,14 +36,13 @@ public class Player : MonoBehaviour
     [Header("Speed PowerUp")]
     [Tooltip("1.3f would be 30% faster")]
     [SerializeField] private float speedPowerUpMultiplier = 1.3f;
-    private bool _isSpeedUpEnabled = false;
     private IEnumerator _speedTimerRef;
 
     [Header("Speed PowerUp")] 
-    [SerializeField] private GameObject shieldsVFXRef;
-
-    private SpawnManager _spawnManager;
     private bool _isShieldOn = false;
+    [SerializeField] private GameObject shieldsVFXRef;
+    
+
     private bool IsShieldOn
     {
         get => _isShieldOn;
@@ -40,6 +50,30 @@ public class Player : MonoBehaviour
         {
             _isShieldOn = value;
             shieldsVFXRef.SetActive(_isShieldOn);
+        }
+    }
+
+    private int Score
+    {
+        get => _score;
+        set
+        {
+            _score = value;
+            if (_uiManager)
+            {
+                _uiManager.UpdateScore(_score);
+            }
+        }
+    }
+
+    private int Health
+    {
+        get => health;
+        set
+        {
+            health = value;
+            if(_uiManager){ _uiManager.UpdateLives(health);}
+            if(health <= 0){ DestroyUs(); }
         }
     }
 
@@ -52,8 +86,10 @@ public class Player : MonoBehaviour
     public void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-        if(_spawnManager == null){Debug.LogError("Spawn_Manager was null");}
-
+        _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        if(_spawnManager == null){Debug.LogError("SpawnManager was null");}
+        if(_uiManager == null){Debug.LogError("UIManager was null");}
         
     }
 
@@ -110,17 +146,15 @@ public class Player : MonoBehaviour
             IsShieldOn = false;
             return;
         }
-        health -= value;
-        Debug.Log($"Player Remaining Health {health}");
-        if(health <= 0){
-            DestroyUs();
-        }
+        Health -= value;
     }
 
     private void DestroyUs()
     {
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
         _spawnManager.OnPlayerDeath();
+        _uiManager.UpdateGameOver(true);
+        _gameManager.GameOver();
         Destroy(gameObject);
     }
 
@@ -169,7 +203,6 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(_speedTimerRef);
         }
-        _isSpeedUpEnabled = true; 
         _speed = baseSpeed * speedPowerUpMultiplier;
         
         _speedTimerRef = PowerUpTimer_SpeedUp(powerUp.Duration);
@@ -191,5 +224,11 @@ public class Player : MonoBehaviour
         }
         IsShieldOn = true;
     }
-    
+
+    public void AddScore(int value)
+    {
+        if(value > 0){
+            Score += value;
+        }
+    }
 }
