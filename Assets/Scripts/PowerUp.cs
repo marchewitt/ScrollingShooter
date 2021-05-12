@@ -10,7 +10,7 @@ public class PowerUp : MonoBehaviour
     [SerializeField] private float speed = 3.0f;
     [SerializeField] private float duration = 3.0f;
     
-    [Tooltip("0 is tripleshot, 1 is speed, 2 is shield")]
+    [Tooltip("0 is TripleShot, 1 is SpeedUp, 2 is Shield")]
     [SerializeField] private int powerUpID;
     public float Duration
     {
@@ -38,11 +38,11 @@ public class PowerUp : MonoBehaviour
             switch (powerUpID)
             {
                 case 0:
-                    Debug.Log("Triple-shot Picked up");
+                    Debug.Log("TripleShot Picked up");
                     player.CollectPowerUp_TripleShot(this);
                     break;
                 case 1:
-                    Debug.Log("Speed Picked up");
+                    Debug.Log("SpeedUp Picked up");
                     player.CollectPowerUp_SpeedUp(this);
                     break;
                 case 2:

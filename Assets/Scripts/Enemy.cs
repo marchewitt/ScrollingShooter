@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using Config;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -78,20 +76,17 @@ public class Enemy : MonoBehaviour
 
     private void OnEnemyDestroy()
     {
-        StartCoroutine(OnEnemyDestroyDelay());
-        //Destroy(gameObject);
-        //Respawn(transform.position.x);
+        StartCoroutine(OnEnemyDestroyDelay(2.6333f));
     }
 
     /// <summary>
     /// Delaying for animation
     /// </summary>
     /// <returns></returns>
-    private IEnumerator OnEnemyDestroyDelay()
+    private IEnumerator OnEnemyDestroyDelay(float clipLength)
     {
         _collider2DRef.enabled = false;
         _animatorRef.SetTrigger(OnDestroyHash);
-        var clipLength = 2.6333f;//Not working as intended: _animatorRef.GetCurrentAnimatorStateInfo((0)).length;
         _speed = 0f;
         yield return new WaitForSeconds(clipLength);
         Respawn(transform.position.x);
