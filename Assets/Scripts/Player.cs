@@ -150,8 +150,8 @@ public class Player : MonoBehaviour
     {
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
         _spawnManager.OnPlayerDeath();
-        Destroy(gameObject);
         _uiManager.UpdateGameOver(true);
+        Destroy(gameObject);
     }
 
     // private IEnumerator _powerUpTimerRef;
