@@ -79,7 +79,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointsWorth: 10
-  speed: 4
+  baseSpeed: 4
+  explosionAudio: {fileID: 8300000, guid: a37420d54160a4341a464d6fb5615548, type: 3}
 --- !u!212 &1057011820650725219
 SpriteRenderer:
   m_ObjectHideFlags: 0
