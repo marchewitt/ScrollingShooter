@@ -86,10 +86,11 @@ public class Player : MonoBehaviour
     public void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-        _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
-        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_spawnManager == null){Debug.LogError("SpawnManager was null");}
-        if(_uiManager == null){Debug.LogError("UIManager was null");}
+        _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
+        if(_uiManager == null){Debug.LogError("UIManager was null on Master_Canvas");}
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        if(_gameManager == null){Debug.LogError("GameManager was null");}
         
     }
 
