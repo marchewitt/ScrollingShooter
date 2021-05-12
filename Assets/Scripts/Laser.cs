@@ -12,12 +12,12 @@ public class Laser : MonoBehaviour
 
         if (transform.position.y >= 8f)
         {
-            DestroyUs();
+            OnDestroyLaser();
         }
     }
 
-    public void DestroyUs()
+    public void OnDestroyLaser()
     {
-        Destroy(transform.parent ? transform.parent.gameObject : gameObject);
+        Destroy(transform.parent ? transform.parent.gameObject : gameObject); //destroy parent if TripleShot laser
     }
 }

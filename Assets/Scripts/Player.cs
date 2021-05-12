@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
         {
             health = value;
             if(_uiManager){ _uiManager.UpdateLives(health);}
-            if(health <= 0){ DestroyUs(); }
+            if(health <= 0){ OnPlayerDestroy(); }
         }
     }
 
@@ -149,7 +149,7 @@ public class Player : MonoBehaviour
         Health -= value;
     }
 
-    private void DestroyUs()
+    private void OnPlayerDestroy()
     {
         //TODO: Instantiate(_deathPrefab, transform.position.x, Quaternion.identity);
         _spawnManager.OnPlayerDeath();
