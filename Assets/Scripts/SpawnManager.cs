@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using Config;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 public class SpawnManager : MonoBehaviour
 {
@@ -17,18 +16,29 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private Vector2 powerUpSpawnRateRange = new Vector2(3f, 7f);
     [SerializeField] private GameObject powerUpContainer;
 
-    private bool _spawnEnemies = true;
-    private bool _spawnPowerUp = true;
+    private bool _spawnEnemies = false;
+    private bool _spawnPowerUp = false;
 
-    private void Start()
+
+    public void StartSpawners()
     {
-        StartCoroutine(SpawnEnemy());
-        StartCoroutine(SpawnPowerUp());
+        if (_spawnEnemies == false)
+        {
+            _spawnEnemies = true;
+            StartCoroutine(SpawnEnemy(2.5f));    
+        }
+
+        if (_spawnPowerUp == false)
+        {
+            _spawnPowerUp = true;
+            StartCoroutine(SpawnPowerUp(5f));    
+        }
     }
 
     #region Spawner Logic
-    private IEnumerator SpawnEnemy()
+    private IEnumerator SpawnEnemy(float initialSpawnDelay)
     {
+        yield return new WaitForSeconds(initialSpawnDelay);
         while (_spawnEnemies)
         {
             var spawnPos = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight),
@@ -40,27 +50,23 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(enemySpawnRate);
         }
     }
-    private IEnumerator SpawnPowerUp()
+    private IEnumerator SpawnPowerUp(float initialSpawnDelay)
     {
-        //First Wait
-        yield return new WaitForSeconds(Random.Range(powerUpSpawnRateRange.x, powerUpSpawnRateRange.y)); 
+        yield return new WaitForSeconds(initialSpawnDelay);
         
         while (_spawnPowerUp)
         {
             var spawnPos = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight),
                 ScreenBounds.ScreenTop + 2f, 0);
 
-            var randomPowerup = Random.Range(0, powerUpPrefabs.Length);
-            var newPowerUp = Instantiate(powerUpPrefabs[randomPowerup], spawnPos, Quaternion.identity);
+            var randomPowerUp = Random.Range(0, powerUpPrefabs.Length);
+            var newPowerUp = Instantiate(powerUpPrefabs[randomPowerUp], spawnPos, Quaternion.identity);
             newPowerUp.transform.parent = powerUpContainer.transform;
             
             var nextSpawnTime = Random.Range(powerUpSpawnRateRange.x, powerUpSpawnRateRange.y);
             yield return new WaitForSeconds(nextSpawnTime);
         }
     }
-    
-    
-
     #endregion
 
     public void OnPlayerDeath()

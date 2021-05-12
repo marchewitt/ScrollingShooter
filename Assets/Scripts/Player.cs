@@ -1,11 +1,7 @@
-using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Config;
-using TMPro.EditorUtilities;
 using UI;
-using UnityEngineInternal;
 
 public class Player : MonoBehaviour
 {
@@ -15,19 +11,20 @@ public class Player : MonoBehaviour
     private GameManager _gameManager;
     
     [Header("Player Data")]
-    private int _score = 0;
+    private float _speed;
+    private int _score;
+
     [Header("Player Config")]
     [SerializeField] private int health = 3;
-    [Tooltip("Players movement speed")]
     [SerializeField] private float baseSpeed = 3.5f;
-    private float _speed = 0;
+    
 
     [Header("Laser Settings")]
     [SerializeField] private Transform laserSpawnPosition;
     [SerializeField] private GameObject laserPrefab;
     [SerializeField] private GameObject tripleShotPrefab;
     [SerializeField] private float fireRate = 0.15f;
-    private float _canFireTimer = 0;
+    private float _canFireLaserTimer;
 
     [Header("TripleShot PowerUp")]
     private bool _isTripleShotEnabled = false;
@@ -86,10 +83,11 @@ public class Player : MonoBehaviour
     public void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-        _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
-        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_spawnManager == null){Debug.LogError("SpawnManager was null");}
-        if(_uiManager == null){Debug.LogError("UIManager was null");}
+        _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
+        if(_uiManager == null){Debug.LogError("UIManager was null on Master_Canvas");}
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        if(_gameManager == null){Debug.LogError("GameManager was null");}
         
     }
 
@@ -97,7 +95,7 @@ public class Player : MonoBehaviour
     {
         CalculateMovement();
 
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFireTimer)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFireLaserTimer)
         {
             FireLaser();
         }
@@ -132,9 +130,9 @@ public class Player : MonoBehaviour
 
     private void FireLaser()
     {
-        _canFireTimer = Time.time + fireRate;
+        _canFireLaserTimer = Time.time + fireRate;
         
-        //Is Power-up active?
+        //Check if Power-up is active or if default laser
         var prefabToUse = _isTripleShotEnabled ? tripleShotPrefab : laserPrefab;
         Instantiate(prefabToUse, laserSpawnPosition.position, Quaternion.identity);
     }
@@ -157,26 +155,6 @@ public class Player : MonoBehaviour
         _gameManager.GameOver();
         Destroy(gameObject);
     }
-
-    // private IEnumerator _powerUpTimerRef;
-    // public void CollectPowerUp(PowerUp powerUp)
-    // {
-    //     if (_powerUpTimerRef != null)
-    //     {
-    //         StopCoroutine(_powerUpTimerRef);
-    //     }
-    //     _isTripleShotEnabled = true; //TODO: unique PowerUp
-    //     _powerUpTimerRef = PowerUpTimer(powerUp.Duration);
-    //     StartCoroutine(_powerUpTimerRef);
-    // }
-    //
-    // private IEnumerator PowerUpTimer(float timer)
-    // {
-    //     Debug.Log("Timer");
-    //     yield return new WaitForSeconds(timer);
-    //     _isTripleShotEnabled = false;
-    // }
-    
 
     public void CollectPowerUp_TripleShot(PowerUp powerUp)
     {
