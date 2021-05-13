@@ -352,13 +352,14 @@ MonoBehaviour:
   baseSpeed: 3.5
   rightEngineRef: {fileID: 6684033497792374704}
   leftEngineRef: {fileID: 5857968492372755384}
-  thursterVFX: {fileID: 3216025566689534231}
+  thrusterMultiplier: 1.4
+  thrusterVFX: {fileID: 3216025566689534231}
   laserFireAudio: {fileID: 8300000, guid: 8f226c26b3ba33c4ab181a285e773a0a, type: 3}
   laserSpawnPosition: {fileID: 7549750829881192046}
   laserPrefab: {fileID: 601476321009827572, guid: b468767f04b48f748a9792e2eb931dc8, type: 3}
   tripleShotPrefab: {fileID: 990644612083187565, guid: 2484f7187977a0749b43d4852c6e8fb4, type: 3}
   fireRate: 0.15
-  speedPowerUpMultiplier: 2
+  speedUpMultiplier: 2
   shieldsVFXRef: {fileID: 6193162782438206980}
 --- !u!212 &5501807560146659420
 SpriteRenderer:

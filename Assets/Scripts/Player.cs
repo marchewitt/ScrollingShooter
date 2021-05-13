@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
     [Header("Thruster Config")]
     [Tooltip("1f would be no change, 1.3f is 30% faster")]
     [SerializeField] private float thrusterMultiplier = 1.4f;
-    [SerializeField] private GameObject thursterVFX;
+    [SerializeField] private GameObject thrusterVFX;
     private bool _isThrusterActive = false;
 
     [Header("Laser Settings")] 
@@ -43,12 +43,12 @@ public class Player : MonoBehaviour
 
     [Header("TripleShot PowerUp")]
     private bool _isTripleShotEnabled = false;
-    private IEnumerator _tripleShotTimerRef;
+    private Coroutine _tripleShotTimerRef;
 
     [Header("Speed PowerUp")]
     [Tooltip("1.3f would be 30% faster")]
-    [SerializeField] private float speedPowerUpMultiplier = 1.3f;
-    private IEnumerator _speedTimerRef;
+    [SerializeField] private float speedUpMultiplier = 2f;
+    private Coroutine _speedTimerRef;
 
     [Header("Speed PowerUp")] 
     private bool _isShieldOn = false;
@@ -103,12 +103,14 @@ public class Player : MonoBehaviour
         set
         {
             _isThrusterActive = value;
-            if (thursterVFX)
+            if (thrusterVFX)
             {
-                thursterVFX.SetActive(_isThrusterActive);
+                thrusterVFX.SetActive(_isThrusterActive);
             }
         }
     }
+    
+    public bool IsSpeedUpActive { get; set; }
 
 
     public void Awake()
@@ -120,8 +122,8 @@ public class Player : MonoBehaviour
         rightEngineRef.SetActive(false);
         if(leftEngineRef == null){Debug.LogError("leftEngineRef was null");}
         leftEngineRef.SetActive(false);
-        if(thursterVFX == null){Debug.LogError("leftEngineRef was null");}
-        thursterVFX.SetActive(false);
+        if(thrusterVFX == null){Debug.LogError("leftEngineRef was null");}
+        thrusterVFX.SetActive(false);
         
         
         _audioSource = gameObject.GetComponent<AudioSource>();
@@ -162,6 +164,17 @@ public class Player : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
+
+
+        #region Speed Modifers
+        /*
+         * Note: Desired math of Speed modified is based on  multipliers
+         * So a 2x speed modifier and 2x speed modifer stack to 4x
+         * So a base speed of 10 would = 40 (10 speed * (2 * 2) = 40).
+         *
+         * We are NOT doing additive speed as that would be (10 speed + (10 + 10) = 30)
+         * This is so if we have a "negative" modifier of say 50% slow down we would get a true 50%
+         */  
         float speedMultiplier = 1f;
 
         if (IsThrusterActive)
@@ -169,7 +182,16 @@ public class Player : MonoBehaviour
             speedMultiplier *= thrusterMultiplier;
         }
 
-        transform.Translate((moveDirection * ((_speed * speedMultiplier) * Time.deltaTime)));    
+        if (IsSpeedUpActive)
+        {
+            speedMultiplier *= speedUpMultiplier;
+        }
+
+        _speed = baseSpeed * speedMultiplier;
+        #endregion
+        
+
+        transform.Translate((moveDirection * (_speed * Time.deltaTime)));    
         
 
         #region Wrap And Clamp Screen Bounds
@@ -188,6 +210,7 @@ public class Player : MonoBehaviour
 
         #endregion
     }
+
 
     private void FireLaser()
     {
@@ -225,13 +248,12 @@ public class Player : MonoBehaviour
             StopCoroutine(_tripleShotTimerRef);
         }
         _isTripleShotEnabled = true;
-        _tripleShotTimerRef = PowerUpTimer_TripleShot(powerUp.Duration);
-        StartCoroutine(_tripleShotTimerRef);
+        _tripleShotTimerRef = StartCoroutine(PowerUpTimer_TripleShot(powerUp.Duration));
+        
     }
 
     private IEnumerator PowerUpTimer_TripleShot(float timer)
     {
-        Debug.Log("Timer");
         yield return new WaitForSeconds(timer);
         _isTripleShotEnabled = false;
     }
@@ -243,17 +265,16 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(_speedTimerRef);
         }
-        _speed = baseSpeed * speedPowerUpMultiplier;
-        
-        _speedTimerRef = PowerUpTimer_SpeedUp(powerUp.Duration);
-        StartCoroutine(_speedTimerRef);
+
+        IsSpeedUpActive = true;
+        _speedTimerRef = StartCoroutine(PowerUpTimer_SpeedUp(powerUp.Duration));
+        //_speedTimerRef;
     }
 
     private IEnumerator PowerUpTimer_SpeedUp(float timer)
     {
-        Debug.Log("Timer");
         yield return new WaitForSeconds(timer);
-        _speed = baseSpeed;
+        IsSpeedUpActive = false;
     }
     
     public void CollectPowerUp_Shield(PowerUp powerUp)
