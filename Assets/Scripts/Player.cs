@@ -25,6 +25,11 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject rightEngineRef;
     [SerializeField] private GameObject leftEngineRef;
     
+    [Header("Thruster Config")]
+    [Tooltip("1f would be no change, 1.3f is 30% faster")]
+    [SerializeField] private float thrusterMultiplier = 1.4f;
+    [SerializeField] private GameObject thursterVFX;
+    private bool _isThrusterActive = false;
 
     [Header("Laser Settings")] 
     
@@ -92,6 +97,18 @@ public class Player : MonoBehaviour
         }
     }
 
+    private bool IsThrusterActive
+    {
+        get => _isThrusterActive;
+        set
+        {
+            _isThrusterActive = value;
+            if (thursterVFX)
+            {
+                thursterVFX.SetActive(_isThrusterActive);
+            }
+        }
+    }
 
 
     public void Awake()
@@ -103,6 +120,10 @@ public class Player : MonoBehaviour
         rightEngineRef.SetActive(false);
         if(leftEngineRef == null){Debug.LogError("leftEngineRef was null");}
         leftEngineRef.SetActive(false);
+        if(thursterVFX == null){Debug.LogError("leftEngineRef was null");}
+        thursterVFX.SetActive(false);
+        
+        
         _audioSource = gameObject.GetComponent<AudioSource>();
         if(_audioSource == null){Debug.LogError("audioSource was null");}
         
@@ -124,22 +145,31 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        CalculateMovement();
+        IsThrusterActive = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFireLaserTimer)
         {
             FireLaser();
         }
+        
+        CalculateMovement();
     }
+
 
     private void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        var moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
+        Vector3 moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
+        float speedMultiplier = 1f;
 
-        transform.Translate((moveDirection * (_speed * Time.deltaTime)));    
+        if (IsThrusterActive)
+        {
+            speedMultiplier *= thrusterMultiplier;
+        }
+
+        transform.Translate((moveDirection * ((_speed * speedMultiplier) * Time.deltaTime)));    
         
 
         #region Wrap And Clamp Screen Bounds
