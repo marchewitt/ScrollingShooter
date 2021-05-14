@@ -10,6 +10,8 @@ namespace UI
     public class UIManager : MonoBehaviour
     {
         [SerializeField] private TMP_Text scoreTextRef;
+        [SerializeField] private TMP_Text engineHeatTextRef;
+        [SerializeField] private RadialDisplay heatRadialRef;
 
         [SerializeField] private Image livesImageRef;
         [SerializeField] private Sprite[] livesSprites;
@@ -34,6 +36,15 @@ namespace UI
             {
                 scoreTextRef.text = $"Score: 0";    
             }
+
+            if (engineHeatTextRef == null)
+            {
+                Debug.LogError("engineHeatTextRef is null");
+            }
+            else
+            {
+                engineHeatTextRef.text = $"Heat:\n0%";    
+            }
         }
 
 
@@ -54,6 +65,14 @@ namespace UI
         public void UpdateGameOver(bool activateGameOver)
         {
             gameOverCanvas.gameObject.SetActive(activateGameOver);
+        }
+
+        public void UpdateEngineHeat(float engineHeat)
+        {
+            heatRadialRef.TargetValue = engineHeat;
+            var engineHeatPercentage = engineHeat * 100;
+            engineHeatTextRef.text = $"Heat:\n{engineHeatPercentage}%";
+            //if value is over x, y, or z, change color
         }
     }
 }

@@ -18,9 +18,14 @@ public class Player : MonoBehaviour
     [Header("Player Data")]
     private float _speed;
     private int _score;
+    private float _currentHeat;
 
     [Header("Player Config")]
     [SerializeField] private int health = 3;
+    [Tooltip("Heat as in Engine Heat is used by Thrusters")]
+    [SerializeField] private float maxHeat = 40f;
+    [Tooltip("Base Heat cooldown per second if no heat is applied")]
+    [SerializeField] private float baseHeatCooldownRate = 5f;
     [SerializeField] private float baseSpeed = 3.5f;
     [SerializeField] private GameObject rightEngineRef;
     [SerializeField] private GameObject leftEngineRef;
@@ -29,6 +34,8 @@ public class Player : MonoBehaviour
     [Tooltip("1f would be no change, 1.3f is 30% faster")]
     [SerializeField] private float thrusterMultiplier = 1.4f;
     [SerializeField] private GameObject thrusterVFX;
+    [Tooltip("Amount of Heat thrusters apply to the ship engine per second - see Player.MaxHeat")] [SerializeField]
+    private float thrusterHeatGen = 10f;
     private bool _isThrusterActive = false;
 
     [Header("Laser Settings")] 
@@ -54,6 +61,7 @@ public class Player : MonoBehaviour
     private bool _isShieldOn = false;
     [SerializeField] private GameObject shieldsVFXRef;
     
+
 
     private bool IsShieldOn
     {
@@ -110,7 +118,28 @@ public class Player : MonoBehaviour
         }
     }
     
-    public bool IsSpeedUpActive { get; set; }
+    private bool IsSpeedUpActive { get; set; }
+
+    private float EngineHeat
+    {
+        get => _currentHeat;
+        set
+        {
+            _currentHeat = value;
+            if (_currentHeat < 0) //never let EngineHeat go below 0 
+            {
+                _currentHeat = 0;
+            }else if (_currentHeat >= maxHeat)
+            {
+                Debug.Log("ENGINE MAXED OUT");
+                //TODO: Engine Burnout effect
+                _currentHeat = maxHeat;
+            }
+            if(_uiManager){
+                _uiManager.UpdateEngineHeat(_currentHeat / maxHeat);
+            }
+        }
+    }
 
 
     public void Awake()
@@ -143,6 +172,7 @@ public class Player : MonoBehaviour
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_gameManager == null){Debug.LogError("GameManager was null");}
         
+        StartCoroutine(CalculateEngineHeat());
     }
 
     private void Update()
@@ -155,6 +185,29 @@ public class Player : MonoBehaviour
         }
         
         CalculateMovement();
+    }
+
+    [Tooltip("Temp value to shift calculation speed")]
+    public float engineTimerRate = 0.15f;
+    private IEnumerator CalculateEngineHeat()
+    {
+        while(true){
+            float heatModifer = 0;
+            if (IsThrusterActive)
+            {
+                heatModifer += thrusterHeatGen;
+            }
+
+            if (heatModifer <= 0)
+            {
+                //If we have a negative or zero heatModifer we combine base cooldown rate into it
+                heatModifer -= baseHeatCooldownRate;
+            }
+            
+            EngineHeat += heatModifer;
+            yield return new WaitForSeconds(engineTimerRate);
+        }
+        
     }
 
 
