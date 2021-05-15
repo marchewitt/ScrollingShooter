@@ -11,7 +11,7 @@ namespace UI
     {
         [SerializeField] private TMP_Text scoreTextRef;
         [SerializeField] private TMP_Text engineHeatTextRef;
-        [SerializeField] private RadialDisplay heatRadialRef;
+        [SerializeField] private FillDisplay heatFillRef;
 
         [SerializeField] private Image livesImageRef;
         [SerializeField] private Sprite[] livesSprites;
@@ -69,7 +69,7 @@ namespace UI
 
         public void UpdateEngineHeat(float engineHeat)
         {
-            heatRadialRef.TargetValue = engineHeat;
+            heatFillRef.TargetValue = engineHeat;
             var engineHeatPercentage = engineHeat * 100;
             engineHeatTextRef.text = $"Heat:\n{engineHeatPercentage}%";
             //if value is over x, y, or z, change color

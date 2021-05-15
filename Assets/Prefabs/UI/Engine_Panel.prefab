@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6475813680423345078}
   - component: {fileID: 7552797820494785263}
   - component: {fileID: 4804415457536206767}
-  - component: {fileID: 4892784114205672731}
+  - component: {fileID: 6358400792710003909}
   m_Layer: 5
-  m_Name: RadialHeatDisplay
+  m_Name: HeatDisplay_ImageFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,12 +31,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6892332077432596360}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -56, y: -14}
+  m_AnchoredPosition: {x: -0.5, y: 2.5}
+  m_SizeDelta: {x: -17, y: -23}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7552797820494785263
 CanvasRenderer:
@@ -66,17 +66,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 0b4f5bce5b001a84bbe5a3cc693b7679, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 3
+  m_FillMethod: 0
   m_FillAmount: 0
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4892784114205672731
+--- !u!114 &6358400792710003909
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -85,10 +85,114 @@ MonoBehaviour:
   m_GameObject: {fileID: 4154175450788207375}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09be9f83d3bf8424385056d7ed7ba251, type: 3}
+  m_Script: {fileID: 11500000, guid: 9548cf8968d065a4dbf7c777e4630468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxDeltaRate: 0.02
+  maxDeltaRate: 0.2
+  gradientFill:
+    serializedVersion: 2
+    key0: {r: 0.95293874, g: 0.99128836, b: 0.31466752, a: 1}
+    key1: {r: 0.9542155, g: 0.72752106, b: 0.24404684, a: 1}
+    key2: {r: 0.95451593, g: 0.6654619, b: 0.22743122, a: 0.52156866}
+    key3: {r: 0.9564326, g: 0.42271334, b: 0.18260914, a: 0.52156866}
+    key4: {r: 0.95686275, g: 0.3682293, b: 0.17254898, a: 0}
+    key5: {r: 0.9622642, g: 0.09311048, b: 0.077162705, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 9225
+    ctime1: 25561
+    ctime2: 29404
+    ctime3: 38821
+    ctime4: 46124
+    ctime5: 60346
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 59945
+    atime3: 59945
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 6
+    m_NumAlphaKeys: 2
+--- !u!1 &4934139368723046032
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 876565951077343725}
+  - component: {fileID: 1186516017368921032}
+  - component: {fileID: 6549036141260598932}
+  m_Layer: 5
+  m_Name: HeatDisplay_Backing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &876565951077343725
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4934139368723046032}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6892332077432596360}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1186516017368921032
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4934139368723046032}
+  m_CullTransparentMesh: 1
+--- !u!114 &6549036141260598932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4934139368723046032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 3903598561057411795, guid: 07c2cae035f374445aa41779283967e4, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &7265927878798402576
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,7 +205,7 @@ GameObject:
   - component: {fileID: 2535139130333506954}
   - component: {fileID: 4772819913973900292}
   m_Layer: 5
-  m_Name: Score_Text (TMP)
+  m_Name: HeatPercentage (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -119,7 +223,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6892332077432596360}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -156,7 +260,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'HEAT
 
-    00%'
+    100%'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
