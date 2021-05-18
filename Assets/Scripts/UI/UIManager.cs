@@ -12,12 +12,28 @@ namespace UI
         [SerializeField] private TMP_Text scoreTextRef;
         [SerializeField] private TMP_Text engineHeatTextRef;
         [SerializeField] private FillDisplay heatFillRef;
+        [SerializeField] private GameObject overHeatedRef;
 
         [SerializeField] private Image livesImageRef;
         [SerializeField] private Sprite[] livesSprites;
 
         [SerializeField] private Canvas gameOverCanvas;
-        
+
+        private bool _isEngineOverheated = false;
+        public bool IsEngineOverheated
+        {
+            get => _isEngineOverheated;
+            set
+            {
+                _isEngineOverheated = value;
+                
+                if (overHeatedRef)
+                {
+                    overHeatedRef.SetActive(_isEngineOverheated);
+                }
+            }
+        }
+
         private void Start()
         {
             if (gameOverCanvas)
@@ -28,22 +44,30 @@ namespace UI
             {
                 Debug.LogError("gameOverCanvas is null");
             }
-            if (scoreTextRef == null)
+            if (scoreTextRef)
+            {
+                scoreTextRef.text = $"Score: 0";
+            }
+            else
             {
                 Debug.LogError("ScoreTextRef is null");
             }
-            else
-            {
-                scoreTextRef.text = $"Score: 0";    
-            }
 
-            if (engineHeatTextRef == null)
+            if (engineHeatTextRef)
+            {
+                engineHeatTextRef.text = $"Heat:\n0%";    
+            }
+            else
             {
                 Debug.LogError("engineHeatTextRef is null");
             }
+            if (overHeatedRef)
+            {
+                overHeatedRef.SetActive(false);
+            }
             else
             {
-                engineHeatTextRef.text = $"Heat:\n0%";    
+                Debug.LogWarning("No overHeated UI object set. Did you forget a reference?");
             }
         }
 

@@ -512,6 +512,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &837925727 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5624585245234264096, guid: 8ccafe035e32b2e4b8a7e9465bbc68a9, type: 3}
+  m_PrefabInstance: {fileID: 8567921787134852303}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &854754652
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,6 +635,7 @@ MonoBehaviour:
   scoreTextRef: {fileID: 545729761}
   engineHeatTextRef: {fileID: 1864138332}
   heatFillRef: {fileID: 1464083663}
+  overHeatedRef: {fileID: 837925727}
   livesImageRef: {fileID: 1642524109}
   livesSprites:
   - {fileID: 21300000, guid: ba53e111f0125654cabfd4eefaf3a657, type: 3}

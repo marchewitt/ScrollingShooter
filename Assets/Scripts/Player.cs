@@ -37,6 +37,9 @@ public class Player : MonoBehaviour
     [Tooltip("Amount of Heat thrusters apply to the ship engine per second - see Player.MaxHeat")] [SerializeField]
     private float thrusterHeatGen = 10f;
     private bool _isThrusterActive = false;
+    private bool _isEngineOverheated = false;
+    [Range(0f,1f)] [Tooltip("When engine is overheated, we can use this field to reduce player speed")]
+    [SerializeField] private float overheatedSpeedMultiplier = 0.7f;
 
     [Header("Laser Settings")] 
     
@@ -60,6 +63,7 @@ public class Player : MonoBehaviour
     [Header("Speed PowerUp")] 
     private bool _isShieldOn = false;
     [SerializeField] private GameObject shieldsVFXRef;
+    
     
 
 
@@ -126,17 +130,36 @@ public class Player : MonoBehaviour
         set
         {
             _currentHeat = value;
-            if (_currentHeat < 0) //never let EngineHeat go below 0 
+            if (_currentHeat <= 0)
             {
                 _currentHeat = 0;
-            }else if (_currentHeat >= maxHeat)
-            {
-                Debug.Log("ENGINE MAXED OUT");
-                //TODO: Engine Burnout effect
-                _currentHeat = maxHeat;
+                if (IsEngineOverheated)
+                {
+                    IsEngineOverheated = false;
+                }
             }
+            else if (_currentHeat > maxHeat)
+            {
+                _currentHeat = maxHeat;
+                IsEngineOverheated = true;
+            }
+            
             if(_uiManager){
                 _uiManager.UpdateEngineHeat(_currentHeat / maxHeat);
+            }
+        }
+    }
+
+    public bool IsEngineOverheated
+    {
+        get => _isEngineOverheated;
+        set
+        {
+            _isEngineOverheated = value;
+            //TODO: Play SFX for when it overheats and reaches 0%
+            if (_uiManager)
+            {
+                _uiManager.IsEngineOverheated = _isEngineOverheated;
             }
         }
     }
@@ -177,7 +200,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        IsThrusterActive = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+        
+        IsThrusterActive = (IsEngineOverheated == false) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+        
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFireLaserTimer)
         {
@@ -233,6 +258,11 @@ public class Player : MonoBehaviour
         if (IsThrusterActive)
         {
             speedMultiplier *= thrusterMultiplier;
+        }
+
+        if (IsEngineOverheated)
+        {
+            speedMultiplier *= overheatedSpeedMultiplier;
         }
 
         if (IsSpeedUpActive)
