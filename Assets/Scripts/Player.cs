@@ -18,13 +18,28 @@ public class Player : MonoBehaviour
     [Header("Player Data")]
     private float _speed;
     private int _score;
+    private float _currentHeat;
 
     [Header("Player Config")]
     [SerializeField] private int health = 3;
+    [Tooltip("Heat as in Engine Heat is used by Thrusters")]
+    [SerializeField] private float maxHeat = 40f;
+    [Tooltip("Base Heat cooldown per second if no heat is applied")]
+    [SerializeField] private float baseHeatCooldownRate = 5f;
     [SerializeField] private float baseSpeed = 3.5f;
     [SerializeField] private GameObject rightEngineRef;
     [SerializeField] private GameObject leftEngineRef;
     
+    [Header("Thruster Config")]
+    [Tooltip("1f would be no change, 1.3f is 30% faster")]
+    [SerializeField] private float thrusterMultiplier = 1.4f;
+    [SerializeField] private GameObject thrusterVFX;
+    [Tooltip("Amount of Heat thrusters apply to the ship engine per second - see Player.MaxHeat")] [SerializeField]
+    private float thrusterHeatGen = 10f;
+    private bool _isThrusterActive = false;
+    private bool _isEngineOverheated = false;
+    [Range(0f,1f)] [Tooltip("When engine is overheated, we can use this field to reduce player speed")]
+    [SerializeField] private float overheatedSpeedMultiplier = 0.7f;
 
     [Header("Laser Settings")] 
     
@@ -38,17 +53,19 @@ public class Player : MonoBehaviour
 
     [Header("TripleShot PowerUp")]
     private bool _isTripleShotEnabled = false;
-    private IEnumerator _tripleShotTimerRef;
+    private Coroutine _tripleShotTimerRef;
 
     [Header("Speed PowerUp")]
     [Tooltip("1.3f would be 30% faster")]
-    [SerializeField] private float speedPowerUpMultiplier = 1.3f;
-    private IEnumerator _speedTimerRef;
+    [SerializeField] private float speedUpMultiplier = 2f;
+    private Coroutine _speedTimerRef;
 
     [Header("Speed PowerUp")] 
     private bool _isShieldOn = false;
     [SerializeField] private GameObject shieldsVFXRef;
     
+    
+
 
     private bool IsShieldOn
     {
@@ -92,6 +109,60 @@ public class Player : MonoBehaviour
         }
     }
 
+    private bool IsThrusterActive
+    {
+        get => _isThrusterActive;
+        set
+        {
+            _isThrusterActive = value;
+            if (thrusterVFX)
+            {
+                thrusterVFX.SetActive(_isThrusterActive);
+            }
+        }
+    }
+    
+    private bool IsSpeedUpActive { get; set; }
+
+    private float EngineHeat
+    {
+        get => _currentHeat;
+        set
+        {
+            _currentHeat = value;
+            if (_currentHeat <= 0)
+            {
+                _currentHeat = 0;
+                if (IsEngineOverheated)
+                {
+                    IsEngineOverheated = false;
+                }
+            }
+            else if (_currentHeat > maxHeat)
+            {
+                _currentHeat = maxHeat;
+                IsEngineOverheated = true;
+            }
+            
+            if(_uiManager){
+                _uiManager.UpdateEngineHeat(_currentHeat / maxHeat);
+            }
+        }
+    }
+
+    public bool IsEngineOverheated
+    {
+        get => _isEngineOverheated;
+        set
+        {
+            _isEngineOverheated = value;
+            //TODO: Play SFX for when it overheats and reaches 0%
+            if (_uiManager)
+            {
+                _uiManager.IsEngineOverheated = _isEngineOverheated;
+            }
+        }
+    }
 
 
     public void Awake()
@@ -103,6 +174,10 @@ public class Player : MonoBehaviour
         rightEngineRef.SetActive(false);
         if(leftEngineRef == null){Debug.LogError("leftEngineRef was null");}
         leftEngineRef.SetActive(false);
+        if(thrusterVFX == null){Debug.LogError("leftEngineRef was null");}
+        thrusterVFX.SetActive(false);
+        
+        
         _audioSource = gameObject.GetComponent<AudioSource>();
         if(_audioSource == null){Debug.LogError("audioSource was null");}
         
@@ -120,24 +195,84 @@ public class Player : MonoBehaviour
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_gameManager == null){Debug.LogError("GameManager was null");}
         
+        StartCoroutine(CalculateEngineHeat());
     }
 
     private void Update()
     {
-        CalculateMovement();
+        
+        IsThrusterActive = (IsEngineOverheated == false) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+        
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFireLaserTimer)
         {
             FireLaser();
         }
+        
+        CalculateMovement();
     }
+
+    [Tooltip("Temp value to shift calculation speed")]
+    public float engineTimerRate = 0.15f;
+    private IEnumerator CalculateEngineHeat()
+    {
+        while(true){
+            float heatModifer = 0;
+            if (IsThrusterActive)
+            {
+                heatModifer += thrusterHeatGen;
+            }
+
+            if (heatModifer <= 0)
+            {
+                //If we have a negative or zero heatModifer we combine base cooldown rate into it
+                heatModifer -= baseHeatCooldownRate;
+            }
+            
+            EngineHeat += heatModifer;
+            yield return new WaitForSeconds(engineTimerRate);
+        }
+        
+    }
+
 
     private void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        var moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
+        Vector3 moveDirection = new Vector3(horizontalInput, verticalInput, 0).normalized;
+
+
+        #region Speed Modifers
+        /*
+         * Note: Desired math of Speed modified is based on  multipliers
+         * So a 2x speed modifier and 2x speed modifer stack to 4x
+         * So a base speed of 10 would = 40 (10 speed * (2 * 2) = 40).
+         *
+         * We are NOT doing additive speed as that would be (10 speed + (10 + 10) = 30)
+         * This is so if we have a "negative" modifier of say 50% slow down we would get a true 50%
+         */  
+        float speedMultiplier = 1f;
+
+        if (IsThrusterActive)
+        {
+            speedMultiplier *= thrusterMultiplier;
+        }
+
+        if (IsEngineOverheated)
+        {
+            speedMultiplier *= overheatedSpeedMultiplier;
+        }
+
+        if (IsSpeedUpActive)
+        {
+            speedMultiplier *= speedUpMultiplier;
+        }
+
+        _speed = baseSpeed * speedMultiplier;
+        #endregion
+        
 
         transform.Translate((moveDirection * (_speed * Time.deltaTime)));    
         
@@ -158,6 +293,7 @@ public class Player : MonoBehaviour
 
         #endregion
     }
+
 
     private void FireLaser()
     {
@@ -195,13 +331,12 @@ public class Player : MonoBehaviour
             StopCoroutine(_tripleShotTimerRef);
         }
         _isTripleShotEnabled = true;
-        _tripleShotTimerRef = PowerUpTimer_TripleShot(powerUp.Duration);
-        StartCoroutine(_tripleShotTimerRef);
+        _tripleShotTimerRef = StartCoroutine(PowerUpTimer_TripleShot(powerUp.Duration));
+        
     }
 
     private IEnumerator PowerUpTimer_TripleShot(float timer)
     {
-        Debug.Log("Timer");
         yield return new WaitForSeconds(timer);
         _isTripleShotEnabled = false;
     }
@@ -213,17 +348,16 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(_speedTimerRef);
         }
-        _speed = baseSpeed * speedPowerUpMultiplier;
-        
-        _speedTimerRef = PowerUpTimer_SpeedUp(powerUp.Duration);
-        StartCoroutine(_speedTimerRef);
+
+        IsSpeedUpActive = true;
+        _speedTimerRef = StartCoroutine(PowerUpTimer_SpeedUp(powerUp.Duration));
+        //_speedTimerRef;
     }
 
     private IEnumerator PowerUpTimer_SpeedUp(float timer)
     {
-        Debug.Log("Timer");
         yield return new WaitForSeconds(timer);
-        _speed = baseSpeed;
+        IsSpeedUpActive = false;
     }
     
     public void CollectPowerUp_Shield(PowerUp powerUp)

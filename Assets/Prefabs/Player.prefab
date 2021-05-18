@@ -57,7 +57,7 @@ Transform:
   m_GameObject: {fileID: 3216025566689534231}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -3.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.8, z: 0.8}
   m_Children: []
   m_Father: {fileID: 7581145933420388880}
   m_RootOrder: 2
@@ -103,7 +103,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: a45d21c30e0154a9ca1a5d6fb2bf3cfa, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.6862745}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -352,13 +352,14 @@ MonoBehaviour:
   baseSpeed: 3.5
   rightEngineRef: {fileID: 6684033497792374704}
   leftEngineRef: {fileID: 5857968492372755384}
-  powerUpAudio: {fileID: 8300000, guid: 69788e6f3d5744e4fa6ed37a490fecea, type: 3}
+  thrusterMultiplier: 1.4
+  thrusterVFX: {fileID: 3216025566689534231}
   laserFireAudio: {fileID: 8300000, guid: 8f226c26b3ba33c4ab181a285e773a0a, type: 3}
   laserSpawnPosition: {fileID: 7549750829881192046}
   laserPrefab: {fileID: 601476321009827572, guid: b468767f04b48f748a9792e2eb931dc8, type: 3}
   tripleShotPrefab: {fileID: 990644612083187565, guid: 2484f7187977a0749b43d4852c6e8fb4, type: 3}
   fireRate: 0.15
-  speedPowerUpMultiplier: 2
+  speedUpMultiplier: 2
   shieldsVFXRef: {fileID: 6193162782438206980}
 --- !u!212 &5501807560146659420
 SpriteRenderer:
