@@ -20,17 +20,19 @@ public class Player : MonoBehaviour
     private AudioSource _audioSource;
     private CinemachineImpulseSource _impulseSource;
     
-    [Header("Player Data")]
+    //Player Data
     private float _speed;
     private int _score;
     private float _currentHeat;
+    private int _shieldStrength;
+    private int _currentHealth;
 
     [Header("Player Config")]
     [Tooltip("This is players max health as well as the starting health")]
     [SerializeField] private int maxHealth = 3;
-    private int _currentHealth;
+    
     [Tooltip("Heat as in Engine Heat is used by Thrusters")]
-    [SerializeField] private float maxHeat = 40f;
+    [SerializeField] private float maxHeat = 50f;
     [Tooltip("Base Heat cooldown per second if no heat is applied")]
     [SerializeField] private float baseHeatCooldownRate = 5f;
     [SerializeField] private float baseSpeed = 3.5f;
@@ -39,12 +41,12 @@ public class Player : MonoBehaviour
     
     [Header("Thruster Config")]
     [Tooltip("1f would be no change, 1.3f is 30% faster")]
-    [SerializeField] private float thrusterMultiplier = 1.4f;
+    [SerializeField] private float thrusterMultiplier = 1.8f;
     [SerializeField] private GameObject thrusterVFX;
     [Tooltip("Amount of Heat thrusters apply to the ship engine per second - see Player.MaxHeat")] [SerializeField]
-    private float thrusterHeatGen = 10f;
-    private bool _isThrusterActive = false;
-    private bool _isEngineOverheated = false;
+    private float thrusterHeatGen = 6f;
+    private bool _isThrusterActive;
+    private bool _isEngineOverheated;
     [Range(0f,1f)] [Tooltip("When engine is overheated, we can use this field to reduce player speed")]
     [SerializeField] private float overheatedSpeedMultiplier = 0.7f;
 
@@ -67,17 +69,16 @@ public class Player : MonoBehaviour
     [SerializeField] private float speedUpMultiplier = 2f;
     private Coroutine _speedTimerRef;
 
-    [Header("Shield PowerUp")] 
-    private bool _isShieldOn = false;
+    [Header("Shield PowerUp")]
     [SerializeField] private SpriteRenderer shieldSpriteVFXRef;
     [FormerlySerializedAs("shieldStateColors")]
     [Tooltip("First will be shield strength 1. Shield being at 0 is just visuals disabled")] 
     [SerializeField] private Color[] shieldStrengthColors;
     [SerializeField] private int shieldMaxStrength = 3;
-    private int _shieldStrength;
+    
 
 
-    private bool IsShieldOn => _shieldStrength > 0;
+    
 
     private int Score
     {
@@ -109,9 +110,31 @@ public class Player : MonoBehaviour
             {
                 _currentHealth = maxHealth;
             }
-            
-            UpdateShipVisuals(_currentHealth);
-            
+
+            if (leftEngineRef && rightEngineRef)
+            {
+                #region Update Ship Visuals
+
+                //Update the ship damage visuals based on currentHealth
+                switch (_currentHealth)
+                {
+                    case 3:
+                        rightEngineRef.SetActive(false);
+                        leftEngineRef.SetActive(false);
+                        break;
+                    case 2:
+                        rightEngineRef.SetActive(true);
+                        leftEngineRef.SetActive(false);
+                        break;
+                    case 1:
+                        rightEngineRef.SetActive(true);
+                        leftEngineRef.SetActive(true);
+                        break;
+                }
+
+                #endregion
+            }
+
         }
     }
 
@@ -188,7 +211,7 @@ public class Player : MonoBehaviour
             }
         }
     }
-
+    private bool IsShieldOn => _shieldStrength > 0;
 
     private void Awake()
     {
@@ -238,9 +261,10 @@ public class Player : MonoBehaviour
     private void InitConfig()
     {
         _speed = baseSpeed;
+        Score = 0;
         Health = maxHealth;
         ShieldStrength = 0;
-        
+        EngineHeat = 0;
     }
 
     private void Update()
@@ -346,6 +370,7 @@ public class Player : MonoBehaviour
         
         //Check if Power-up is active or if default laser
         var prefabToUse = _isTripleShotEnabled ? tripleShotPrefab : laserPrefab;
+        
         Instantiate(prefabToUse, laserSpawnPosition.position, Quaternion.identity);
         PlayOneShot(laserFireAudio);
     }
@@ -370,15 +395,17 @@ public class Player : MonoBehaviour
         Destroy(gameObject);
     }
 
+    #region PowerUp Handling
+    
     public void CollectPowerUp_TripleShot(PowerUp powerUp)
     {
         if (_tripleShotTimerRef != null)
         {
             StopCoroutine(_tripleShotTimerRef);
         }
+        
         _isTripleShotEnabled = true;
         _tripleShotTimerRef = StartCoroutine(PowerUpTimer_TripleShot(powerUp.Duration));
-        
     }
 
     private IEnumerator PowerUpTimer_TripleShot(float timer)
@@ -394,10 +421,9 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(_speedTimerRef);
         }
-
+        
         IsSpeedUpActive = true;
         _speedTimerRef = StartCoroutine(PowerUpTimer_SpeedUp(powerUp.Duration));
-        //_speedTimerRef;
     }
 
     private IEnumerator PowerUpTimer_SpeedUp(float timer)
@@ -406,39 +432,18 @@ public class Player : MonoBehaviour
         IsSpeedUpActive = false;
     }
     
-    public void CollectPowerUp_Shield(PowerUp powerUp)
-    {
-        ShieldStrength++;
-    }
-
+    public void CollectPowerUp_Shield(PowerUp powerUp) => ShieldStrength++;
+    
+    public void CollectPowerUp_ExtraLife(PowerUp powerUp) => Health += 1;
+    
+    
+    #endregion
+    
     public void AddScore(int value)
     {
-        if(value > 0){
-            Score += value;
-        }
+        if (value <= 0) { return; }
+        Score += value;
     }
-    
-    
-    private void UpdateShipVisuals(int currentHealth)
-    {
-        //Update the ship damage visuals based on currentHealth
-        switch(currentHealth)
-        {
-            case 3:
-                rightEngineRef.SetActive(false);
-                leftEngineRef.SetActive(false);
-                break;
-            case 2:
-                rightEngineRef.SetActive(true);
-                leftEngineRef.SetActive(false);
-                break;
-            case 1:
-                rightEngineRef.SetActive(true);
-                leftEngineRef.SetActive(true);
-                break;
-        }
-    }
-
 
     private void PlayOneShot(AudioClip clip)
     {
@@ -446,10 +451,5 @@ public class Player : MonoBehaviour
         {
             _audioSource.PlayOneShot(clip);
         }
-    }
-
-    public void CollectPowerUp_ExtraLife(PowerUp powerUp)
-    {
-        Health += 1;
     }
 }
