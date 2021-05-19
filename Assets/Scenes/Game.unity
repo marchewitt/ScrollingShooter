@@ -1162,6 +1162,7 @@ MonoBehaviour:
   - {fileID: 4712528788082069719, guid: b50a5b0a9c279514bac665de7408800f, type: 3}
   - {fileID: 4997313122428793372, guid: 0cb7462fc55758041a28d15ff789e3f6, type: 3}
   - {fileID: 2431724626264836089, guid: ae05d0623e5cb2546983002dccc57ae8, type: 3}
+  - {fileID: 6617574035004322768, guid: 0a38649c90ae39c44b422c23b55b0ffc, type: 3}
   powerUpSpawnRateRange: {x: 3, y: 7}
   powerUpContainer: {fileID: 604592229}
 --- !u!114 &1464083663 stripped
