@@ -371,7 +371,7 @@ MonoBehaviour:
   - {r: 0.6784314, g: 0.07450981, b: 0.47058824, a: 0.6509804}
   - {r: 1, g: 1, b: 1, a: 0.6313726}
   shieldMaxStrength: 3
-  engineTimerRate: 0.15
+  screenShakeForce: 2.5
 --- !u!212 &5501807560146659420
 SpriteRenderer:
   m_ObjectHideFlags: 0
