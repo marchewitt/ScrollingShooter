@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject tripleShotPrefab;
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireLaserTimer;
+    [SerializeField] private GameObject laserContainer;
 
     [Header("TripleShot PowerUp")]
     private bool _isTripleShotEnabled = false;
@@ -268,7 +269,7 @@ public class Player : MonoBehaviour
         if(_uiManager == null){Debug.LogError("UIManager was null on Master_Canvas");}
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_gameManager == null){Debug.LogError("GameManager was null");}
-        
+        if(laserContainer == null){Debug.LogError("laserContainer was null");}
         
         InitConfig();
         StartCoroutine(CalculateEngineHeat());
@@ -383,11 +384,12 @@ public class Player : MonoBehaviour
 
     private void FireLaser()
     {
+        GameObject laser = null;
         _canFireLaserTimer = Time.time + fireRate;
         if (_isTripleShotEnabled)
         {
             //TripleShot PowerUp does not use Ammo
-            Instantiate(tripleShotPrefab, laserSpawnPosition.position, Quaternion.identity);
+            laser = Instantiate(tripleShotPrefab, laserSpawnPosition.position, Quaternion.identity);
             PlayOneShot(laserFireAudio);
         }
         else if ( HasAmmo == false)
@@ -399,8 +401,14 @@ public class Player : MonoBehaviour
         else{ 
             //DefaultLaser
             Ammo--;
-            Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
+            laser = Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
             PlayOneShot(laserFireAudio);
+        }
+
+        //Put laser into container
+        if (laser)
+        {
+            laser.transform.parent = laserContainer.transform;
         }
     }
 
