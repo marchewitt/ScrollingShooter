@@ -79,7 +79,7 @@ namespace UI
         
         public void UpdateLives(int value)
         {
-            if(value < 0 || value> livesSprites.Length) {
+            if(value < 0 || value >= livesSprites.Length) {
                 return;
             }
             var sprite = livesSprites[value];
