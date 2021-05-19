@@ -76,7 +76,9 @@ public class Player : MonoBehaviour
     [SerializeField] private Color[] shieldStrengthColors;
     [SerializeField] private int shieldMaxStrength = 3;
     
-
+    [Header("Effects")]
+    [Tooltip("OnHit we fire off ImpulseSource with this ScreenShakeForce")]
+    [SerializeField] private float screenShakeForce = 2.5f;
 
     
 
@@ -281,8 +283,8 @@ public class Player : MonoBehaviour
         CalculateMovement();
     }
 
-    [Tooltip("Temp value to shift calculation speed")]
-    public float engineTimerRate = 0.15f;
+    
+
     private IEnumerator CalculateEngineHeat()
     {
         while(true){
@@ -299,7 +301,7 @@ public class Player : MonoBehaviour
             }
             
             EngineHeat += heatModifer;
-            yield return new WaitForSeconds(engineTimerRate);
+            yield return new WaitForSeconds(0.15f);
         }
         
     }
@@ -382,7 +384,7 @@ public class Player : MonoBehaviour
             ShieldStrength--;
             return;
         }
-        _impulseSource.GenerateImpulse();
+        _impulseSource.GenerateImpulse(screenShakeForce);
         Health -= value;
     }
 
