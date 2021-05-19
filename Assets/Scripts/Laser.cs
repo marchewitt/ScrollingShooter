@@ -18,6 +18,6 @@ public class Laser : MonoBehaviour
 
     public void OnDestroyLaser()
     {
-        Destroy(transform.parent ? transform.parent.gameObject : gameObject); //destroy parent if TripleShot laser
+        Destroy(transform.parent && transform.parent.CompareTag("Container") == false ? transform.parent.gameObject : gameObject); //destroy parent if TripleShot laser
     }
 }
