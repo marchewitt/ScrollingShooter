@@ -9,7 +9,8 @@ using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
-[RequireComponent(typeof(AudioSource))][RequireComponent(typeof(CinemachineImpulseSource))]
+[RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(CinemachineImpulseSource))]
 public class Player : MonoBehaviour
 {
     //Manager Refs
@@ -58,13 +59,13 @@ public class Player : MonoBehaviour
     [SerializeField] private AudioClip noAmmoSFX;
     [SerializeField] private Transform laserSpawnPosition;
     [SerializeField] private GameObject laserPrefab;
-    [SerializeField] private GameObject tripleShotPrefab;
+    
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireLaserTimer;
     [SerializeField] private GameObject laserContainer;
 
     [Header("TripleShot PowerUp")]
-    private bool _isTripleShotEnabled = false;
+    [SerializeField] private GameObject tripleShotPrefab;
     private Coroutine _tripleShotTimerRef;
 
     [Header("Speed PowerUp")]
@@ -236,6 +237,8 @@ public class Player : MonoBehaviour
     }
     private bool HasAmmo => _currentAmmo > 0;
 
+    private bool IsTripleShotEnabled { get; set; }
+    
     private void Awake()
     {
         if(rightEngineRef == null){Debug.LogError("rightEngineRef was null");}
@@ -395,7 +398,7 @@ public class Player : MonoBehaviour
     {
         GameObject newObj = null;
         _canFireLaserTimer = Time.time + fireRate;
-        if (_isTripleShotEnabled)
+        if (IsTripleShotEnabled)
         {
             //TripleShot PowerUp does not use Ammo
             newObj = Instantiate(tripleShotPrefab, laserSpawnPosition.position, Quaternion.identity);
@@ -413,7 +416,7 @@ public class Player : MonoBehaviour
         }
 
         //Put laser into container
-        if (newObj != null)
+        if (newObj)
         {
             newObj.transform.parent = laserContainer.transform;
         }
@@ -448,14 +451,14 @@ public class Player : MonoBehaviour
             StopCoroutine(_tripleShotTimerRef);
         }
         
-        _isTripleShotEnabled = true;
+        IsTripleShotEnabled = true;
         _tripleShotTimerRef = StartCoroutine(PowerUpTimer_TripleShot(powerUp.Duration));
     }
 
     private IEnumerator PowerUpTimer_TripleShot(float timer)
     {
         yield return new WaitForSeconds(timer);
-        _isTripleShotEnabled = false;
+        IsTripleShotEnabled = false;
     }
 
 
