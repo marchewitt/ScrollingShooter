@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 public class PowerUp : MonoBehaviour
 {
     [SerializeField] private float speed = 3.0f;
-    [SerializeField] private float duration = 3.0f;
+    [SerializeField] private float duration = 0f;
     
     [Tooltip("0 is TripleShot, 1 is SpeedUp, 2 is Shield, 3 is ExtraLife")]
     [SerializeField] private int powerUpID;
@@ -54,6 +54,13 @@ public class PowerUp : MonoBehaviour
                 case 3:
                     Debug.Log("ExtraLife Picked Up");
                     player.CollectPowerUp_ExtraLife(this);
+                    break;
+                case 4:
+                    Debug.Log("Ammo Picked Up");
+                    player.CollectPowerUp_Ammo(this);
+                    break;
+                default:
+                    Debug.Log($"Missing PowerUp ID! Was given {powerUpID}");
                     break;
             }
         }

@@ -9,14 +9,22 @@ namespace UI
     
     public class UIManager : MonoBehaviour
     {
+        [Header("Score Panel")]
         [SerializeField] private TMP_Text scoreTextRef;
+        
+        [Header("Ammo Panel")]
+        [SerializeField] private TMP_Text ammoCountTextRef;
+        
+        [Header("Engine Panel")]
         [SerializeField] private TMP_Text engineHeatTextRef;
         [SerializeField] private FillDisplay heatFillRef;
         [SerializeField] private GameObject overHeatedRef;
 
+        [Header("Lives Panel")]
         [SerializeField] private Image livesImageRef;
         [SerializeField] private Sprite[] livesSprites;
 
+        [Header("GameOver Canvas")]
         [SerializeField] private Canvas gameOverCanvas;
 
         private bool _isEngineOverheated = false;
@@ -69,6 +77,15 @@ namespace UI
             {
                 Debug.LogWarning("No overHeated UI object set. Did you forget a reference?");
             }
+
+            if (ammoCountTextRef)
+            {
+                //Updated by player
+            }
+            else
+            {
+                Debug.LogError("AmmoCountTextRef is null");
+            }
         }
 
 
@@ -79,7 +96,7 @@ namespace UI
         
         public void UpdateLives(int value)
         {
-            if(value < 0 || value> livesSprites.Length) {
+            if(value < 0 || value >= livesSprites.Length) {
                 return;
             }
             var sprite = livesSprites[value];
@@ -98,5 +115,7 @@ namespace UI
             engineHeatTextRef.text = $"Heat:\n{engineHeatPercentage}%";
             //if value is over x, y, or z, change color
         }
+
+        public void UpdateAmmo(int currentAmmo, int maxAmmo) => ammoCountTextRef.text = $"{currentAmmo} / {maxAmmo}";
     }
 }

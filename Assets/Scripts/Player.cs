@@ -7,6 +7,7 @@ using Managers;
 using UI;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 [RequireComponent(typeof(AudioSource))][RequireComponent(typeof(CinemachineImpulseSource))]
 public class Player : MonoBehaviour
@@ -26,15 +27,16 @@ public class Player : MonoBehaviour
     private float _currentHeat;
     private int _shieldStrength;
     private int _currentHealth;
+    private int _currentAmmo;
 
     [Header("Player Config")]
-    [Tooltip("This is players max health as well as the starting health")]
+    [Tooltip("This is players max health as well as their starting health")]
     [SerializeField] private int maxHealth = 3;
     
     [Tooltip("Heat as in Engine Heat is used by Thrusters")]
     [SerializeField] private float maxHeat = 50f;
-    [Tooltip("Base Heat cooldown per second if no heat is applied")]
-    [SerializeField] private float baseHeatCooldownRate = 5f;
+    [Tooltip("Base Heat cooldown per tick if no heat is applied to engine")]
+    [Range(0f, 10.0f)] [SerializeField] private float baseHeatCooldownRate = 5f;
     [SerializeField] private float baseSpeed = 3.5f;
     [SerializeField] private GameObject rightEngineRef;
     [SerializeField] private GameObject leftEngineRef;
@@ -50,15 +52,16 @@ public class Player : MonoBehaviour
     [Range(0f,1f)] [Tooltip("When engine is overheated, we can use this field to reduce player speed")]
     [SerializeField] private float overheatedSpeedMultiplier = 0.7f;
 
-    [Header("Laser Settings")] 
-    
-    [SerializeField] private AudioClip laserFireAudio;
-    
+    [Header("Laser Settings")]
+    [Range(0, 30)] [SerializeField] private int maxLaserAmmo = 15;
+    [FormerlySerializedAs("laserFireAudio")] [SerializeField] private AudioClip laserFireSFX;
+    [SerializeField] private AudioClip noAmmoSFX;
     [SerializeField] private Transform laserSpawnPosition;
     [SerializeField] private GameObject laserPrefab;
     [SerializeField] private GameObject tripleShotPrefab;
     [SerializeField] private float fireRate = 0.15f;
     private float _canFireLaserTimer;
+    [SerializeField] private GameObject laserContainer;
 
     [Header("TripleShot PowerUp")]
     private bool _isTripleShotEnabled = false;
@@ -72,15 +75,16 @@ public class Player : MonoBehaviour
     [Header("Shield PowerUp")]
     [SerializeField] private SpriteRenderer shieldSpriteVFXRef;
     [FormerlySerializedAs("shieldStateColors")]
-    [Tooltip("First will be shield strength 1. Shield being at 0 is just visuals disabled")] 
+    [Tooltip("First color will be shield strength 1. Shield being at 0 is just visuals disabled")] 
     [SerializeField] private Color[] shieldStrengthColors;
     [SerializeField] private int shieldMaxStrength = 3;
     
-    [Header("Effects")]
+    [Header("Misc Effects")]
     [Tooltip("OnHit we fire off ImpulseSource with this ScreenShakeForce")]
     [SerializeField] private float screenShakeForce = 2.5f;
 
     
+
 
     private int Score
     {
@@ -215,6 +219,23 @@ public class Player : MonoBehaviour
     }
     private bool IsShieldOn => _shieldStrength > 0;
 
+    private int Ammo
+    {
+        get => _currentAmmo;
+        set
+        {
+            _currentAmmo = value;
+            _currentAmmo = Math.Max(0, _currentAmmo);
+            _currentAmmo = Math.Min(_currentAmmo, maxLaserAmmo);
+
+            if (_uiManager)
+            {
+                _uiManager.UpdateAmmo(_currentAmmo, maxLaserAmmo);
+            }
+        }
+    }
+    private bool HasAmmo => _currentAmmo > 0;
+
     private void Awake()
     {
         if(rightEngineRef == null){Debug.LogError("rightEngineRef was null");}
@@ -229,10 +250,13 @@ public class Player : MonoBehaviour
         if(_audioSource == null){Debug.LogError("audioSource was null");}
 
         _impulseSource = gameObject.GetComponent<CinemachineImpulseSource>();
-        if(_impulseSource == null){Debug.LogError("CinemachineImpulseSource was null");}
+        if(_impulseSource == null){Debug.LogError("CineMachineImpulseSource was null");}
         
-        if(laserFireAudio == null){
+        if(laserFireSFX == null){
             Debug.LogError("laserFireAudio was null");
+        }
+        if(noAmmoSFX == null){
+            Debug.LogError("noAmmoSFX was null");
         }
 
         
@@ -254,7 +278,7 @@ public class Player : MonoBehaviour
         if(_uiManager == null){Debug.LogError("UIManager was null on Master_Canvas");}
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_gameManager == null){Debug.LogError("GameManager was null");}
-        
+        if(laserContainer == null){Debug.LogError("laserContainer was null");}
         
         InitConfig();
         StartCoroutine(CalculateEngineHeat());
@@ -267,6 +291,7 @@ public class Player : MonoBehaviour
         Health = maxHealth;
         ShieldStrength = 0;
         EngineHeat = 0;
+        Ammo = maxLaserAmmo;
     }
 
     private void Update()
@@ -368,13 +393,30 @@ public class Player : MonoBehaviour
 
     private void FireLaser()
     {
+        GameObject newObj = null;
         _canFireLaserTimer = Time.time + fireRate;
-        
-        //Check if Power-up is active or if default laser
-        var prefabToUse = _isTripleShotEnabled ? tripleShotPrefab : laserPrefab;
-        
-        Instantiate(prefabToUse, laserSpawnPosition.position, Quaternion.identity);
-        PlayOneShot(laserFireAudio);
+        if (_isTripleShotEnabled)
+        {
+            //TripleShot PowerUp does not use Ammo
+            newObj = Instantiate(tripleShotPrefab, laserSpawnPosition.position, Quaternion.identity);
+            PlayOneShot(laserFireSFX);
+        }
+        else if ( HasAmmo == false)
+        {
+            PlayOneShot(noAmmoSFX);
+        }
+        else{ 
+            //DefaultLaser
+            Ammo--;
+            newObj = Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
+            PlayOneShot(laserFireSFX);
+        }
+
+        //Put laser into container
+        if (newObj != null)
+        {
+            newObj.transform.parent = laserContainer.transform;
+        }
     }
 
     public void TakeDamage(int value)
@@ -437,6 +479,8 @@ public class Player : MonoBehaviour
     public void CollectPowerUp_Shield(PowerUp powerUp) => ShieldStrength++;
     
     public void CollectPowerUp_ExtraLife(PowerUp powerUp) => Health += 1;
+    
+    public void CollectPowerUp_Ammo(PowerUp powerUp) => Ammo = maxLaserAmmo;
     
     
     #endregion
