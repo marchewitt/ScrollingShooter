@@ -360,11 +360,13 @@ MonoBehaviour:
   thrusterHeatGen: 6
   overheatedSpeedMultiplier: 0.7
   maxLaserAmmo: 15
-  laserFireAudio: {fileID: 8300000, guid: 8f226c26b3ba33c4ab181a285e773a0a, type: 3}
+  laserFireSFX: {fileID: 8300000, guid: 8f226c26b3ba33c4ab181a285e773a0a, type: 3}
+  noAmmoSFX: {fileID: 8300000, guid: 69788e6f3d5744e4fa6ed37a490fecea, type: 3}
   laserSpawnPosition: {fileID: 7549750829881192046}
   laserPrefab: {fileID: 601476321009827572, guid: b468767f04b48f748a9792e2eb931dc8, type: 3}
   tripleShotPrefab: {fileID: 990644612083187565, guid: 2484f7187977a0749b43d4852c6e8fb4, type: 3}
   fireRate: 0.15
+  laserContainer: {fileID: 0}
   speedUpMultiplier: 2
   shieldSpriteVFXRef: {fileID: 3956180986041148275}
   shieldStrengthColors:
