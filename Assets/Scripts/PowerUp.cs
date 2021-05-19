@@ -10,8 +10,9 @@ public class PowerUp : MonoBehaviour
     [SerializeField] private float speed = 3.0f;
     [SerializeField] private float duration = 3.0f;
     
-    [Tooltip("0 is tripleshot, 1 is speed, 2 is shield")]
+    [Tooltip("0 is TripleShot, 1 is SpeedUp, 2 is Shield, 3 is ExtraLife")]
     [SerializeField] private int powerUpID;
+    [SerializeField] private AudioClip powerUpAudio;
     public float Duration
     {
         get => duration;
@@ -35,19 +36,24 @@ public class PowerUp : MonoBehaviour
         var player = other.GetComponent<Player>();
         if (player)
         {
+            AudioSource.PlayClipAtPoint(powerUpAudio, transform.position);
             switch (powerUpID)
             {
                 case 0:
-                    Debug.Log("Triple-shot Picked up");
+                    Debug.Log("TripleShot Picked up");
                     player.CollectPowerUp_TripleShot(this);
                     break;
                 case 1:
-                    Debug.Log("Speed Picked up");
+                    Debug.Log("SpeedUp Picked up");
                     player.CollectPowerUp_SpeedUp(this);
                     break;
                 case 2:
                     Debug.Log("Shield Picked up");
                     player.CollectPowerUp_Shield(this);
+                    break;
+                case 3:
+                    Debug.Log("ExtraLife Picked Up");
+                    player.CollectPowerUp_ExtraLife(this);
                     break;
             }
         }
