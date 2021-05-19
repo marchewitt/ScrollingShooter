@@ -1,10 +1,11 @@
 using System.Collections;
+using Cinemachine;
 using UnityEngine;
 using Config;
 using Managers;
 using UI;
 
-[RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(AudioSource))][RequireComponent(typeof(CinemachineImpulseSource))]
 public class Player : MonoBehaviour
 {
     //Manager Refs
@@ -14,6 +15,7 @@ public class Player : MonoBehaviour
     
     //Internal Refs
     private AudioSource _audioSource;
+    private CinemachineImpulseSource _impulseSource;
     
     [Header("Player Data")]
     private float _speed;
@@ -99,6 +101,7 @@ public class Player : MonoBehaviour
         {
             _currentHealth = value;
             if(_uiManager){ _uiManager.UpdateLives(_currentHealth);}
+            
 
             if (_currentHealth <= 0)
             {
@@ -172,6 +175,7 @@ public class Player : MonoBehaviour
 
     public void Awake()
     {
+        
         shieldsVFXRef.SetActive(false);
         _speed = baseSpeed;
         Health = maxHealth;
@@ -186,6 +190,9 @@ public class Player : MonoBehaviour
         
         _audioSource = gameObject.GetComponent<AudioSource>();
         if(_audioSource == null){Debug.LogError("audioSource was null");}
+
+        _impulseSource = gameObject.GetComponent<CinemachineImpulseSource>();
+        if(_impulseSource == null){Debug.LogError("CinemachineImpulseSource was null");}
         
         if(laserFireAudio == null){
             Debug.LogError("laserFireAudio was null");
@@ -320,6 +327,7 @@ public class Player : MonoBehaviour
             IsShieldOn = false;
             return;
         }
+        _impulseSource.GenerateImpulse();
         Health -= value;
     }
 
