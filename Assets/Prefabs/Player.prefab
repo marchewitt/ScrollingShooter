@@ -359,6 +359,7 @@ MonoBehaviour:
   thrusterVFX: {fileID: 3216025566689534231}
   thrusterHeatGen: 6
   overheatedSpeedMultiplier: 0.7
+  maxLaserAmmo: 15
   laserFireAudio: {fileID: 8300000, guid: 8f226c26b3ba33c4ab181a285e773a0a, type: 3}
   laserSpawnPosition: {fileID: 7549750829881192046}
   laserPrefab: {fileID: 601476321009827572, guid: b468767f04b48f748a9792e2eb931dc8, type: 3}

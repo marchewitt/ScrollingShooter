@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
     private float _currentHeat;
     private int _shieldStrength;
     private int _currentHealth;
+    private int _currentAmmo;
 
     [Header("Player Config")]
     [Tooltip("This is players max health as well as the starting health")]
@@ -51,7 +52,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float overheatedSpeedMultiplier = 0.7f;
 
     [Header("Laser Settings")] 
-    
+    [Range(0, 30)]
+    [SerializeField] private int maxLaserAmmo = 15;
     [SerializeField] private AudioClip laserFireAudio;
     
     [SerializeField] private Transform laserSpawnPosition;
@@ -215,6 +217,18 @@ public class Player : MonoBehaviour
     }
     private bool IsShieldOn => _shieldStrength > 0;
 
+    private int Ammo
+    {
+        get => _currentAmmo;
+        set
+        {
+            _currentAmmo = value;
+            _currentAmmo = Math.Max(0, _currentAmmo);
+            _currentAmmo = Math.Min(_currentAmmo, maxLaserAmmo);
+        }
+    }
+    private bool HasAmmo => _currentAmmo > 0;
+
     private void Awake()
     {
         if(rightEngineRef == null){Debug.LogError("rightEngineRef was null");}
@@ -267,6 +281,7 @@ public class Player : MonoBehaviour
         Health = maxHealth;
         ShieldStrength = 0;
         EngineHeat = 0;
+        Ammo = maxLaserAmmo;
     }
 
     private void Update()
@@ -369,12 +384,24 @@ public class Player : MonoBehaviour
     private void FireLaser()
     {
         _canFireLaserTimer = Time.time + fireRate;
-        
-        //Check if Power-up is active or if default laser
-        var prefabToUse = _isTripleShotEnabled ? tripleShotPrefab : laserPrefab;
-        
-        Instantiate(prefabToUse, laserSpawnPosition.position, Quaternion.identity);
-        PlayOneShot(laserFireAudio);
+        if (_isTripleShotEnabled)
+        {
+            //TripleShot PowerUp does not use Ammo
+            Instantiate(tripleShotPrefab, laserSpawnPosition.position, Quaternion.identity);
+            PlayOneShot(laserFireAudio);
+        }
+        else if ( HasAmmo == false)
+        {
+            Debug.Log("No Ammo");
+            //Play SFX No Ammo
+            //Flash Visual warning
+        }
+        else{ 
+            //DefaultLaser
+            Ammo--;
+            Instantiate(laserPrefab, laserSpawnPosition.position, Quaternion.identity);
+            PlayOneShot(laserFireAudio);
+        }
     }
 
     public void TakeDamage(int value)
@@ -437,6 +464,8 @@ public class Player : MonoBehaviour
     public void CollectPowerUp_Shield(PowerUp powerUp) => ShieldStrength++;
     
     public void CollectPowerUp_ExtraLife(PowerUp powerUp) => Health += 1;
+    
+    public void CollectPowerUp_Ammo(PowerUp powerUp) => Ammo = maxLaserAmmo;
     
     
     #endregion
