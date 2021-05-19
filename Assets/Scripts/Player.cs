@@ -21,7 +21,9 @@ public class Player : MonoBehaviour
     private float _currentHeat;
 
     [Header("Player Config")]
-    [SerializeField] private int health = 3;
+    [Tooltip("This is players max health as well as the starting health")]
+    [SerializeField] private int maxHealth = 3;
+    private int _currentHealth;
     [Tooltip("Heat as in Engine Heat is used by Thrusters")]
     [SerializeField] private float maxHeat = 40f;
     [Tooltip("Base Heat cooldown per second if no heat is applied")]
@@ -92,20 +94,23 @@ public class Player : MonoBehaviour
 
     private int Health
     {
-        get => health;
+        get => _currentHealth;
         set
         {
-            health = value;
-            if(_uiManager){ _uiManager.UpdateLives(health);}
+            _currentHealth = value;
+            if(_uiManager){ _uiManager.UpdateLives(_currentHealth);}
 
-            if (health <= 0)
+            if (_currentHealth <= 0)
             {
                 OnPlayerDestroy();
             }
-            else
+            else if (_currentHealth > maxHealth)
             {
-                UpdateShipVisuals(health);
+                _currentHealth = maxHealth;
             }
+            
+            UpdateShipVisuals(_currentHealth);
+            
         }
     }
 
@@ -169,6 +174,7 @@ public class Player : MonoBehaviour
     {
         shieldsVFXRef.SetActive(false);
         _speed = baseSpeed;
+        Health = maxHealth;
         
         if(rightEngineRef == null){Debug.LogError("rightEngineRef was null");}
         rightEngineRef.SetActive(false);
@@ -184,6 +190,8 @@ public class Player : MonoBehaviour
         if(laserFireAudio == null){
             Debug.LogError("laserFireAudio was null");
         }
+
+        
     }
 
     public void Start()
@@ -404,5 +412,10 @@ public class Player : MonoBehaviour
         {
             _audioSource.PlayOneShot(clip);
         }
+    }
+
+    public void CollectPowerUp_ExtraLife(PowerUp powerUp)
+    {
+        Health += 1;
     }
 }
