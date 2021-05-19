@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using Cinemachine;
 using UnityEngine;
 using Config;
 using Managers;
 using UI;
+using UnityEngine.PlayerLoop;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(AudioSource))][RequireComponent(typeof(CinemachineImpulseSource))]
 public class Player : MonoBehaviour
@@ -64,22 +67,17 @@ public class Player : MonoBehaviour
     [SerializeField] private float speedUpMultiplier = 2f;
     private Coroutine _speedTimerRef;
 
-    [Header("Speed PowerUp")] 
+    [Header("Shield PowerUp")] 
     private bool _isShieldOn = false;
-    [SerializeField] private GameObject shieldsVFXRef;
-    
-    
+    [SerializeField] private SpriteRenderer shieldSpriteVFXRef;
+    [FormerlySerializedAs("shieldStateColors")]
+    [Tooltip("First will be shield strength 1. Shield being at 0 is just visuals disabled")] 
+    [SerializeField] private Color[] shieldStrengthColors;
+    [SerializeField] private int shieldMaxStrength = 3;
+    private int _shieldStrength;
 
 
-    private bool IsShieldOn
-    {
-        get => _isShieldOn;
-        set
-        {
-            _isShieldOn = value;
-            shieldsVFXRef.SetActive(_isShieldOn);
-        }
-    }
+    private bool IsShieldOn => _shieldStrength > 0;
 
     private int Score
     {
@@ -158,7 +156,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public bool IsEngineOverheated
+    private bool IsEngineOverheated
     {
         get => _isEngineOverheated;
         set
@@ -172,14 +170,28 @@ public class Player : MonoBehaviour
         }
     }
 
-
-    public void Awake()
+    private int ShieldStrength
     {
-        
-        shieldsVFXRef.SetActive(false);
-        _speed = baseSpeed;
-        Health = maxHealth;
-        
+        get => _shieldStrength;
+        set
+        {
+            _shieldStrength = value;
+            _shieldStrength = Math.Max(_shieldStrength, 0); //prevent negative
+            _shieldStrength = Math.Min(_shieldStrength, shieldMaxStrength); //prevent going over max
+
+            if(shieldSpriteVFXRef){
+                if (IsShieldOn && _shieldStrength <= shieldStrengthColors.Length)
+                {
+                    shieldSpriteVFXRef.color = shieldStrengthColors[_shieldStrength - 1];
+                }
+                shieldSpriteVFXRef.enabled = IsShieldOn;
+            }
+        }
+    }
+
+
+    private void Awake()
+    {
         if(rightEngineRef == null){Debug.LogError("rightEngineRef was null");}
         rightEngineRef.SetActive(false);
         if(leftEngineRef == null){Debug.LogError("leftEngineRef was null");}
@@ -203,6 +215,14 @@ public class Player : MonoBehaviour
 
     public void Start()
     {
+        if (shieldSpriteVFXRef)
+        {
+            shieldSpriteVFXRef.enabled = false;            
+        }
+        else{Debug.LogError("ShieldSpriteVFXRef was null");}
+        
+        if(shieldMaxStrength > shieldStrengthColors.Length){Debug.LogError("ShieldMaxStrength is higher than shieldStateColors length.");}
+
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         if(_spawnManager == null){Debug.LogError("SpawnManager was null");}
         _uiManager = GameObject.Find("Master_Canvas").GetComponent<UIManager>();
@@ -210,7 +230,17 @@ public class Player : MonoBehaviour
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if(_gameManager == null){Debug.LogError("GameManager was null");}
         
+        
+        InitConfig();
         StartCoroutine(CalculateEngineHeat());
+    }
+
+    private void InitConfig()
+    {
+        _speed = baseSpeed;
+        Health = maxHealth;
+        ShieldStrength = 0;
+        
     }
 
     private void Update()
@@ -324,7 +354,7 @@ public class Player : MonoBehaviour
     {
         if (IsShieldOn)
         {
-            IsShieldOn = false;
+            ShieldStrength--;
             return;
         }
         _impulseSource.GenerateImpulse();
@@ -378,11 +408,7 @@ public class Player : MonoBehaviour
     
     public void CollectPowerUp_Shield(PowerUp powerUp)
     {
-        if (IsShieldOn)
-        {
-            return;
-        }
-        IsShieldOn = true;
+        ShieldStrength++;
     }
 
     public void AddScore(int value)
